@@ -1,12 +1,12 @@
 import {createElement} from '../render';
 
-const createListEmptyTemplate = () => (
-  '<p class="trip-events__msg">Click New Event to create your first point</p>'
+const createEventAddButtonTemplate = () => (
+  '<button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button">New event</button>'
 );
 
-export default class ListEmtyView {
+export default class EventAddButtonView {
   getTemplate() {
-    return createListEmptyTemplate();
+    return createEventAddButtonTemplate();
   }
 
   getElement() {
