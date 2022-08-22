@@ -1,20 +1,28 @@
-import {getRandomInteger} from '../utils';
+import {getRandomInteger, getRandomValue} from '../utils';
+import {TYPES} from '../const';
 
-const generateOfferTitle = () => {
-  const titles = [
-    'Upgrade to a business class',
-    'Book tickets',
-    'Lunch in city'
-  ];
-  const randomIndex = getRandomInteger(0, titles.length - 1);
+const titles = [
+  'Upgrade to a business class',
+  'Choose the radio station',
+  'Choose temperature',
+  'Book a taxi at the arrival point',
+  'Order a breakfast',
+  'Wake up at a certain time',
+  'Choose meal',
+  'Upgrade to comfort class'
+];
 
-  return titles[randomIndex];
-};
-
-export const offerGenerate = () => (
+const generateOffer = (index) => (
   {
-    id: getRandomInteger(1, 3),
-    title: generateOfferTitle(),
-    price: getRandomInteger(200, 1500)
+    id: index + 1,
+    title: getRandomValue(titles),
+    price: getRandomInteger(100, 300)
+  }
+);
+
+export const generateOffersType = (index) => (
+  {
+    type: TYPES[index],
+    offers: Array.from({length: 3}, (_value, i) => generateOffer(i))
   }
 );
