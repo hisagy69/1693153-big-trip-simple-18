@@ -92,23 +92,27 @@ const createTripPointAddTemplate = (offersByTypes, destinations) => {
 };
 
 export default class TripPointAddView {
+  #element = null;
+  #offers = [];
+  #destinations = [];
+
   constructor(offers, destinations) {
-    this.offers = offers;
-    this.destinations = destinations;
+    this.#offers = offers;
+    this.#destinations = destinations;
   }
 
-  getTemplate() {
-    return createTripPointAddTemplate(this.offers, this.destinations);
+  get template() {
+    return createTripPointAddTemplate(this.#offers, this.#destinations);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
