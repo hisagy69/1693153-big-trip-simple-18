@@ -29,10 +29,14 @@ export default class ListPresenter {
 
     render(this.#listSortComponent, this.#listContainer);
     render(this.#tripPointsListComponent, this.#listContainer);
-    render(new TripPointEditView(this.#points[0], this.#offers, this.#destinations), this.#tripPointsListComponent.element);
-    render(new TripPointAddView(this.#offers, this.#destinations), this.#tripPointsListComponent.element);
+
     for (let i = 0; i < this.#points.length; i++) {
-      render(new TripPointView(this.#points[i], this.#offers, this.#destinations), this.#tripPointsListComponent.element);
+      render(this.#renderPoint(this.#points[i]), this.#tripPointsListComponent.element);
     }
-  };
+  }
+
+  #renderPoint = (point) => {
+    const tripPointComponent = new TripPointView(point, this.#offers, this.#destinations);
+    render(tripPointComponent, this.#tripPointsListComponent.element)
+  }
 }
