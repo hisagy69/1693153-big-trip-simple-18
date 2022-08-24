@@ -46,11 +46,30 @@ export default class ListPresenter {
       this.#tripPointsListComponent.element.replaceChild(tripPointComponent.element, tripEditComponent.element);
     };
 
-    tripPointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', replaceCardToForm);
+    const onCloseCard = () => {
+      replaceFormToCard();
+      document.removeEventListener('click', onCloseCard);
+    };
+
+    const onEscKeyDown = (event) => {
+      if (event.key === 'Escape' || event.key === 'esc') {
+        event.preventDefault();
+        replaceFormToCard();
+        document.removeEventListener('keydown', onEscKeyDown);
+        document.removeEventListener('click', onCloseCard);
+      }
+    };
+
+    tripPointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replaceCardToForm();
+      document.addEventListener('keydown', onEscKeyDown);
+    });
 
     tripEditComponent.element.querySelector('form').addEventListener('submit', (event) => {
       event.preventDefault();
       replaceFormToCard();
+      document.removeEventListener('keydown', onEscKeyDown);
+      document.removeEventListener('click', onCloseCard);
     });
 
     render(tripPointComponent, this.#tripPointsListComponent.element);
