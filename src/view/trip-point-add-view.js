@@ -9,10 +9,6 @@ const createTripPointAddTemplate = (offersByTypes, destinations) => {
   const {type, offers} = offersByTypes[0];
 
   const dateNow = new Date;
-  const date = {
-    time: humanizePointTime(dateNow),
-    dateDMY: humanizePointDateDMY(dateNow)
-  };
 
   return (`<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -47,10 +43,10 @@ const createTripPointAddTemplate = (offersByTypes, destinations) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${date.dateDMY} ${date.time}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizePointDateDMY(dateNow)} ${humanizePointTime(dateNow)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${date.dateDMY} ${date.time}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizePointDateDMY(dateNow)} ${humanizePointTime(dateNow)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
