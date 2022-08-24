@@ -21,7 +21,7 @@ const generateImageLink = () => (
 
 export const generateDestination = (index) => (
   {
-    id: index + 1,
+    id: index,
     description: getRandomValue(descriptions),
     name: getRandomValue(names),
     pictures: Array.from({length: 5}, generateImageLink)

@@ -14,7 +14,7 @@ const titles = [
 
 const generateOffer = (index) => (
   {
-    id: index + 1,
+    id: index,
     title: getRandomValue(titles),
     price: getRandomInteger(100, 300)
   }

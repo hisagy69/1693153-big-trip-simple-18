@@ -1,6 +1,5 @@
 import ListSortView from '../view/list-sort-view.js';
 import TripPointEditView from '../view/trip-point-edit-view.js';
-import TripPointAddView from '../view/trip-point-add-view.js';
 import TripPointsListView from '../view/trip-points-list-view.js';
 import TripPointView from '../view/trip-point-view.js';
 import {render} from '../render.js';
@@ -31,12 +30,29 @@ export default class ListPresenter {
     render(this.#tripPointsListComponent, this.#listContainer);
 
     for (let i = 0; i < this.#points.length; i++) {
-      render(this.#renderPoint(this.#points[i]), this.#tripPointsListComponent.element);
+      this.#renderPoint(this.#points[i]);
     }
-  }
+  };
 
   #renderPoint = (point) => {
     const tripPointComponent = new TripPointView(point, this.#offers, this.#destinations);
-    render(tripPointComponent, this.#tripPointsListComponent.element)
-  }
+    const tripEditComponent = new TripPointEditView(point, this.#offers, this.#destinations);
+
+    const replaceCardToForm = () => {
+      this.#tripPointsListComponent.element.replaceChild(tripEditComponent.element, tripPointComponent.element);
+    };
+
+    const replaceFormToCard = () => {
+      this.#tripPointsListComponent.element.replaceChild(tripPointComponent.element, tripEditComponent.element);
+    };
+
+    tripPointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', replaceCardToForm);
+
+    tripEditComponent.element.querySelector('form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      replaceFormToCard();
+    });
+
+    render(tripPointComponent, this.#tripPointsListComponent.element);
+  };
 }
