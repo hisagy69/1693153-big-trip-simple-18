@@ -3,7 +3,7 @@ import {
   humanizePointDate,
   humanizePointDateNumber,
   humanizePointTime,
-  humanizePointDateRFC,
+  getPointDateRFC,
   isPointExpired
 } from '../utils';
 
@@ -13,33 +13,18 @@ const createPointTemplate = (point, offersTypes, destinations) => {
   const offersByType = offersTypes.find((offer) => offer.type === type);
   const offers = offersByType ? offersByType.offers : [];
 
-  const dateStart = dateFrom !== null ?
-    {
-      string: humanizePointDate(dateFrom),
-      number: humanizePointDateNumber(dateFrom),
-      time: humanizePointTime(dateFrom),
-      dateRFC: humanizePointDateRFC(dateFrom)
-    } :
-    '';
-  const dateEnd = dateTo !== null ?
-    {
-      time: humanizePointTime(dateTo),
-      dateRFC: humanizePointDateRFC(dateTo)
-    } :
-    '';
-
   return (`<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="${dateStart.number}">${dateStart.string}</time>
+      <time class="event__date" datetime="${humanizePointDateNumber(dateFrom)}">${humanizePointDate(dateFrom)}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${destination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${dateStart.dateRFC}">${dateStart.time}</time>
+          <time class="event__start-time" datetime="${getPointDateRFC(dateFrom)}">${humanizePointTime(dateFrom)}</time>
           &mdash;
-          <time class="event__end-time" datetime="${dateEnd.dateRFC}">${dateEnd.time}</time>
+          <time class="event__end-time" datetime="${getPointDateRFC(dateTo)}">${humanizePointTime(dateTo)}</time>
         </p>
       </div>
       <p class="event__price">
@@ -65,24 +50,29 @@ const createPointTemplate = (point, offersTypes, destinations) => {
 };
 
 export default class TripPointView {
+  #element = null;
+  #point = null;
+  #offers = [];
+  #destinations = [];
+
   constructor(point, offers, destinations) {
-    this.point = point;
-    this.offers = offers;
-    this.destinations = destinations;
+    this.#point = point;
+    this.#offers = offers;
+    this.#destinations = destinations;
   }
 
-  getTemplate() {
-    return createPointTemplate(this.point, this.offers, this.destinations);
+  get template() {
+    return createPointTemplate(this.#point, this.#offers, this.#destinations);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

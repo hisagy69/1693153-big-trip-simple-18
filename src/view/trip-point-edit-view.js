@@ -11,19 +11,6 @@ const createTripPointEditTemplate = (point, offersByTypes, destinations) => {
   const destination = destinations.find((item) => item.id === id);
   const offers = offersByType ? offersByType.offers : [];
 
-  const dateStart = dateFrom !== null ?
-    {
-      time: humanizePointTime(dateFrom),
-      dateDMY: humanizePointDateDMY(dateFrom)
-    } :
-    '';
-  const dateEnd = dateTo !== null ?
-    {
-      time: humanizePointTime(dateTo),
-      dateDMY: humanizePointDateDMY(dateTo)
-    } :
-    '';
-
   return (`<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
@@ -58,10 +45,10 @@ const createTripPointEditTemplate = (point, offersByTypes, destinations) => {
         </div>
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateStart.dateDMY} ${dateStart.time}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizePointDateDMY(dateFrom)} ${humanizePointTime(dateFrom)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateEnd.dateDMY} ${dateStart.time}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizePointDateDMY(dateTo)} ${humanizePointTime(dateTo)}">
         </div>
         <div class="event__field-group  event__field-group--price">
           <label class="event__label" for="event-price-1">
@@ -101,24 +88,29 @@ const createTripPointEditTemplate = (point, offersByTypes, destinations) => {
 };
 
 export default class TripPointEditView {
+  #element = null;
+  #point = [];
+  #offers = [];
+  #destinations = [];
+
   constructor(point, offers, destinations) {
-    this.point = point;
-    this.offers = offers;
-    this.destinations = destinations;
+    this.#point = point;
+    this.#offers = offers;
+    this.#destinations = destinations;
   }
 
-  getTemplate() {
-    return createTripPointEditTemplate(this.point, this.offers, this.destinations);
+  get template() {
+    return createTripPointEditTemplate(this.#point, this.#offers, this.#destinations);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

@@ -15,7 +15,7 @@ const getRandomValue = (arr) => {
 const humanizePointDate = (dueDate) => dayjs(dueDate).format('MMMM D').toUpperCase();
 const humanizePointDateNumber = (dueDate) => dayjs(dueDate).format('YYYY-MM-DD');
 const humanizePointTime = (dueDate) => dayjs(dueDate).format('HH:mm');
-const humanizePointDateRFC = (dueDate) => dayjs(dueDate).format('YYYY-MM-DDTHH:mm');
+const getPointDateRFC = (dueDate) => dayjs(dueDate).format('YYYY-MM-DDTHH:mm');
 const humanizePointDateDMY = (dueDate) => dayjs(dueDate).format('DD/MM/YY');
 const isPointExpired = (dueDate) => dayjs().isAfter(dueDate, 'D');
 
@@ -25,7 +25,7 @@ export {
   humanizePointDate,
   humanizePointDateNumber,
   humanizePointTime,
-  humanizePointDateRFC,
+  getPointDateRFC,
   humanizePointDateDMY,
   isPointExpired
 };
