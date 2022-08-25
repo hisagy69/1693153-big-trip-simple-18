@@ -2,11 +2,13 @@ import ListSortView from '../view/list-sort-view.js';
 import TripPointEditView from '../view/trip-point-edit-view.js';
 import TripPointsListView from '../view/trip-points-list-view.js';
 import TripPointView from '../view/trip-point-view.js';
+import ListEmptyView from '../view/list-empty-view.js';
 import {render} from '../render.js';
 
 export default class ListPresenter {
   #listSortComponent = new ListSortView();
   #tripPointsListComponent = new TripPointsListView();
+  #listEmptyComponent = new ListEmptyView();
   #listContainer = null;
   #pointsModel = null;
   #offersModel = null;
@@ -26,11 +28,14 @@ export default class ListPresenter {
     this.#offers = this.#offersModel.offers;
     this.#destinations = this.#destinationsModel.destinations;
 
-    render(this.#listSortComponent, this.#listContainer);
-    render(this.#tripPointsListComponent, this.#listContainer);
-
-    for (let i = 0; i < this.#points.length; i++) {
-      this.#renderPoint(this.#points[i]);
+    if (this.#points.length > 0) {
+      render(this.#listSortComponent, this.#listContainer);
+      render(this.#tripPointsListComponent, this.#listContainer);
+      for (let i = 0; i < this.#points.length; i++) {
+        this.#renderPoint(this.#points[i]);
+      }
+    } else {
+      render(this.#listEmptyComponent, this.#listContainer);
     }
   };
 
