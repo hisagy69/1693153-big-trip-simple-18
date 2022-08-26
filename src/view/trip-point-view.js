@@ -7,11 +7,8 @@ import {
   isPointExpired
 } from '../utils';
 
-const createPointTemplate = (point, offersTypes, destinations) => {
-  const {dateFrom, dateTo, basePrice, type, id} = point;
-  const destination = destinations.find((item) => item.id === id);
-  const offersByType = offersTypes.find((offer) => offer.type === type);
-  const offers = offersByType ? offersByType.offers : [];
+const createPointTemplate = (point, offersByType, destination) => {
+  const {dateFrom, dateTo, basePrice, type} = point;
 
   return (`<li class="trip-events__item">
     <div class="event">
@@ -32,7 +29,7 @@ const createPointTemplate = (point, offersTypes, destinations) => {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${offers.length > 0 ? offers.map((offer) => (`<li class="event__offer">
+        ${offersByType.length > 0 ? offersByType.map((offer) => (`<li class="event__offer">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
             <span class="event__offer-price">${offer.price}</span>
@@ -52,17 +49,17 @@ const createPointTemplate = (point, offersTypes, destinations) => {
 export default class TripPointView {
   #element = null;
   #point = null;
-  #offers = [];
-  #destinations = [];
+  #offersByType = [];
+  #destination = null;
 
-  constructor(point, offers, destinations) {
+  constructor(point, offersByType, destination) {
     this.#point = point;
-    this.#offers = offers;
-    this.#destinations = destinations;
+    this.#offersByType = offersByType;
+    this.#destination = destination;
   }
 
   get template() {
-    return createPointTemplate(this.#point, this.#offers, this.#destinations);
+    return createPointTemplate(this.#point, this.#offersByType, this.#destination);
   }
 
   get element() {
