@@ -40,8 +40,11 @@ export default class ListPresenter {
   };
 
   #renderPoint = (point) => {
-    const tripPointComponent = new TripPointView(point, this.#offers, this.#destinations);
-    const tripEditComponent = new TripPointEditView(point, this.#offers, this.#destinations);
+    const destination = this.#destinations.find((item) => item.id === point.id);
+    const offersByType = this.#offers.find((item) => item.type === point.type);
+    const offers = offersByType ? offersByType.offers : [];
+    const tripPointComponent = new TripPointView(point, offers, destination);
+    const tripEditComponent = new TripPointEditView(point, offers, destination, this.#destinations);
 
     const replaceCardToForm = () => {
       this.#tripPointsListComponent.element.replaceChild(tripEditComponent.element, tripPointComponent.element);
@@ -51,17 +54,11 @@ export default class ListPresenter {
       this.#tripPointsListComponent.element.replaceChild(tripPointComponent.element, tripEditComponent.element);
     };
 
-    const onCloseCard = () => {
-      replaceFormToCard();
-      document.removeEventListener('click', onCloseCard);
-    };
-
     const onEscKeyDown = (event) => {
       if (event.key === 'Escape' || event.key === 'esc') {
         event.preventDefault();
         replaceFormToCard();
         document.removeEventListener('keydown', onEscKeyDown);
-        document.removeEventListener('click', onCloseCard);
       }
     };
 
@@ -74,8 +71,9 @@ export default class ListPresenter {
       event.preventDefault();
       replaceFormToCard();
       document.removeEventListener('keydown', onEscKeyDown);
-      document.removeEventListener('click', onCloseCard);
     });
+
+    tripEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', replaceFormToCard);
 
     render(tripPointComponent, this.#tripPointsListComponent.element);
   };
