@@ -1,15 +1,12 @@
-import {createElement} from '../render';
+import AbstractView from '../framework/view/abstract-view';
 import {TYPES} from '../const';
 import {
   humanizePointTime,
   humanizePointDateDMY,
 } from '../utils';
 
-const createTripPointEditTemplate = (point, offersByTypes, destinations) => {
-  const {dateFrom, dateTo, type, basePrice, id} = point;
-  const offersByType = offersByTypes.find((offer) => offer.type === type);
-  const destination = destinations.find((item) => item.id === id);
-  const offers = offersByType ? offersByType.offers : [];
+const createTripPointEditTemplate = (point, offersByType, destination, destinations) => {
+  const {dateFrom, dateTo, type, basePrice} = point;
 
   return (`<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -67,7 +64,7 @@ const createTripPointEditTemplate = (point, offersByTypes, destinations) => {
         <section class="event__section  event__section--offers">
           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
           <div class="event__available-offers">
-            ${offers.length > 0 ? offers.map((offer) => (`<div class="event__offer-selector">
+            ${offersByType.length > 0 ? offersByType.map((offer) => (`<div class="event__offer-selector">
                   <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
                   <label class="event__offer-label" for="event-offer-luggage-1">
                     <span class="event__offer-title">${offer.title}</span>
@@ -87,30 +84,40 @@ const createTripPointEditTemplate = (point, offersByTypes, destinations) => {
   </li>`);
 };
 
-export default class TripPointEditView {
-  #element = null;
-  #point = [];
-  #offers = [];
+export default class TripPointEditView extends AbstractView {
+  #point = null;
+  #offersByType = [];
+  #destination = null;
   #destinations = [];
 
-  constructor(point, offers, destinations) {
+  constructor(point, offersByType, destination, destinations) {
+    super();
     this.#point = point;
-    this.#offers = offers;
+    this.#offersByType = offersByType;
+    this.#destination = destination;
     this.#destinations = destinations;
   }
 
   get template() {
-    return createTripPointEditTemplate(this.#point, this.#offers, this.#destinations);
+    return createTripPointEditTemplate(this.#point, this.#offersByType, this.#destination, this.#destinations);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  setEditClickHandler = (callback) => {
+    this._callback.formClose = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formCloseHandler);
+  };
+
+  #formSubmitHandler = (event) => {
+    event.preventDefault();
+    this._callback.formSubmit();
+  };
+
+  #formCloseHandler = () => {
+    this._callback.formClose();
+  };
 }

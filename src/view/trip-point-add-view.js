@@ -1,4 +1,4 @@
-import {createElement} from '../render';
+import AbstractView from '../framework/view/abstract-view';
 import {TYPES} from '../const';
 import {
   humanizePointTime,
@@ -91,28 +91,17 @@ const createTripPointAddTemplate = (offersByTypes, destinations) => {
   </li>`);
 };
 
-export default class TripPointAddView {
-  #element = null;
+export default class TripPointAddView extends AbstractView {
   #offers = [];
   #destinations = [];
 
   constructor(offers, destinations) {
+    super();
     this.#offers = offers;
     this.#destinations = destinations;
   }
 
   get template() {
     return createTripPointAddTemplate(this.#offers, this.#destinations);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
