@@ -3,7 +3,7 @@ import TripPointEditView from '../view/trip-point-edit-view.js';
 import TripPointsListView from '../view/trip-points-list-view.js';
 import TripPointView from '../view/trip-point-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
-import {render} from '../render.js';
+import {render} from '../framework/render.js';
 
 export default class ListPresenter {
   #listSortComponent = new ListSortView();

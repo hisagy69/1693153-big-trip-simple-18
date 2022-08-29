@@ -1,5 +1,5 @@
 import ListFilterView from './view/list-filter-view';
-import {render} from './render';
+import {render} from './framework/render';
 import ListPresenter from './presenter/list-presenter';
 import PointAddButtonView from './view/point-add-button-view';
 import PointsModel from './model/points-model';
