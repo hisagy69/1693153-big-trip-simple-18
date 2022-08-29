@@ -1,5 +1,5 @@
 import {TYPES} from '../const';
-import {getRandomValue, getRandomInteger} from '../utils';
+import {getRandomValue, getRandomInteger} from '../utils/common';
 
 const generateOffersId = () => {
   const numberOfOffers = getRandomInteger(0, 2);

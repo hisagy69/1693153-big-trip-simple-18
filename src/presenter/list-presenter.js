@@ -3,7 +3,7 @@ import TripPointEditView from '../view/trip-point-edit-view.js';
 import TripPointsListView from '../view/trip-points-list-view.js';
 import TripPointView from '../view/trip-point-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
-import {render} from '../framework/render.js';
+import {render, replace} from '../framework/render.js';
 
 export default class ListPresenter {
   #listSortComponent = new ListSortView();
@@ -47,11 +47,11 @@ export default class ListPresenter {
     const tripEditComponent = new TripPointEditView(point, offers, destination, this.#destinations);
 
     const replaceCardToForm = () => {
-      this.#tripPointsListComponent.element.replaceChild(tripEditComponent.element, tripPointComponent.element);
+      replace(tripEditComponent, tripPointComponent);
     };
 
     const replaceFormToCard = () => {
-      this.#tripPointsListComponent.element.replaceChild(tripPointComponent.element, tripEditComponent.element);
+      replace(tripPointComponent, tripEditComponent);
     };
 
     const onEscKeyDown = (event) => {

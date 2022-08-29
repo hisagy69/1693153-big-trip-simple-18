@@ -5,7 +5,7 @@ import {
   humanizePointTime,
   getPointDateRFC,
   isPointExpired
-} from '../utils';
+} from '../utils/points';
 
 const createPointTemplate = (point, offersByType, destination) => {
   const {dateFrom, dateTo, basePrice, type} = point;
