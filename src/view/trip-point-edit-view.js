@@ -101,4 +101,23 @@ export default class TripPointEditView extends AbstractView {
   get template() {
     return createTripPointEditTemplate(this.#point, this.#offersByType, this.#destination, this.#destinations);
   }
+
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+  };
+
+  setEditClickHandler = (callback) => {
+    this._callback.formClose = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formCloseHandler);
+  };
+
+  #formSubmitHandler = (event) => {
+    event.preventDefault();
+    this._callback.formSubmit();
+  };
+
+  #formCloseHandler = () => {
+    this._callback.formClose();
+  };
 }

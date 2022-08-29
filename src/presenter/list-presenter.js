@@ -62,18 +62,20 @@ export default class ListPresenter {
       }
     };
 
-    tripPointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    tripPointComponent.setClickHandler(() => {
       replaceCardToForm();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    tripEditComponent.element.querySelector('form').addEventListener('submit', (event) => {
-      event.preventDefault();
+    tripEditComponent.setFormSubmitHandler(() => {
       replaceFormToCard();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    tripEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', replaceFormToCard);
+    tripEditComponent.setEditClickHandler(() => {
+      replaceFormToCard();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
 
     render(tripPointComponent, this.#tripPointsListComponent.element);
   };
