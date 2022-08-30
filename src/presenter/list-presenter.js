@@ -27,9 +27,9 @@ export default class ListPresenter {
     this.#points = this.#pointsModel.points;
     this.#offers = this.#offersModel.offers;
     this.#destinations = this.#destinationsModel.destinations;
+    render(this.#listSortComponent, this.#listContainer);
 
     if (this.#points.length > 0) {
-      render(this.#listSortComponent, this.#listContainer);
       render(this.#tripPointsListComponent, this.#listContainer);
       for (let i = 0; i < this.#points.length; i++) {
         this.#renderPoint(this.#points[i]);

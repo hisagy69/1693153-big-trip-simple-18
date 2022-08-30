@@ -10,7 +10,10 @@ const getRandomValue = (arr) => {
   return arr[randomIndex];
 };
 
+const capitalizeFirstLetter = (str) => `${str[0]}${str.slice(1)}`;
+
 export {
   getRandomInteger,
-  getRandomValue
+  getRandomValue,
+  capitalizeFirstLetter
 };
