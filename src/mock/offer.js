@@ -1,4 +1,4 @@
-import {getRandomInteger, getRandomValue} from '../utils';
+import {getRandomInteger, getRandomValue} from '../utils/common';
 import {TYPES} from '../const';
 
 const titles = [

@@ -1,4 +1,4 @@
-import {getRandomValue} from '../utils';
+import {getRandomValue} from '../utils/common';
 
 const descriptions = [
   'Chamonix, is a beautiful city, a true asian pearl, with crowded streets.',

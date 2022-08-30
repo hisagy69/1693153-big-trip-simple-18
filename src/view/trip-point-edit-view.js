@@ -3,7 +3,7 @@ import {TYPES} from '../const';
 import {
   humanizePointTime,
   humanizePointDateDMY,
-} from '../utils';
+} from '../utils/points';
 
 const createTripPointEditTemplate = (point, offersByType, destination, destinations) => {
   const {dateFrom, dateTo, type, basePrice} = point;
