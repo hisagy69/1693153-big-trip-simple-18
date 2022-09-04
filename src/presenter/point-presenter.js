@@ -1,7 +1,8 @@
 import TripPointEditView from '../view/trip-point-edit-view.js';
 import TripPointView from '../view/trip-point-view.js';
-import {replace, render} from '../framework/render.js';
-export default class PointPresentor {
+import {replace, render, remove} from '../framework/render.js';
+
+export default class PointPresenter {
   #offers = [];
   #offersAll = [];
   #destinations = [];
@@ -20,9 +21,13 @@ export default class PointPresentor {
 
   init(point) {
     this.#point = point;
-    this.#destination = this.#destinations.find((item) => item.id === point.id);
+    this.#destination = this.#destinations.find((item) => item.id === point.destination);
+
     this.#offersByType = this.#offersAll.find((item) => item.type === point.type);
     this.#offers = this.#offersByType ? this.#offersByType.offers : [];
+
+    const prevPointComponent = this.#tripPointComponent;
+    const prevEditComponent = this.#tripEditComponent;
 
     this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destination);
     this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destination, this.#destinations);
@@ -31,7 +36,21 @@ export default class PointPresentor {
     this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
     this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
 
-    render(this.#tripPointComponent, this.#listContainer);
+    if (prevPointComponent === null || prevEditComponent === null) {
+      render(this.#tripPointComponent, this.#listContainer);
+      return;
+    }
+
+    if (this.#listContainer.contains(prevPointComponent.element)) {
+      replace(this.#tripEditComponent, this.#tripPointComponent);
+    }
+
+    if (this.#listContainer.contains(prevEditComponent.element)) {
+      replace(this.#tripPointComponent, this.#tripEditComponent);
+    }
+
+    remove(prevPointComponent);
+    remove(prevEditComponent);
   }
 
   #replaceCardToForm = () => {
@@ -63,5 +82,10 @@ export default class PointPresentor {
   #handleFormSubmit = () => {
     this.#replaceFormToCard();
     document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  destroy = () => {
+    remove(this.#tripPointComponent);
+    remove(this.#tripEditComponent);
   };
 }

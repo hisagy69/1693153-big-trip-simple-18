@@ -1,4 +1,4 @@
-import PointPresentor from './point-presentor.js';
+import PointPresenter from './point-presenter.js';
 import ListSortView from '../view/list-sort-view.js';
 import TripPointsListView from '../view/trip-points-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
@@ -15,6 +15,7 @@ export default class ListPresenter {
   #offers = [];
   #destinations = [];
   #points = [];
+  #pointPresenter = new Map();
 
   init = (listContainer, pointsModel, offersModel, destinationsModel) => {
     this.#listContainer = listContainer;
@@ -55,7 +56,13 @@ export default class ListPresenter {
   };
 
   #renderPoint = (point) => {
-    const pointPresentor = new PointPresentor(this.#tripPointsListComponent.element, this.#destinations, this.#offers);
-    pointPresentor.init(point);
+    const pointPresenter = new PointPresenter(this.#tripPointsListComponent.element, this.#destinations, this.#offers);
+    pointPresenter.init(point);
+    this.#pointPresenter.set(point.id, pointPresenter);
+  };
+
+  #clearPointList = () => {
+    this.#pointPresenter.forEach((presenter) => presenter.destroy());
+    this.#pointPresenter.clear();
   };
 }

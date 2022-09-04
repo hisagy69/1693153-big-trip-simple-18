@@ -1,4 +1,5 @@
 import {getRandomInteger, getRandomValue} from '../utils/common';
+import {offersId} from './utils';
 import {TYPES} from '../const';
 
 const titles = [
@@ -12,9 +13,9 @@ const titles = [
   'Upgrade to comfort class'
 ];
 
-const generateOffer = (index) => (
+const generateOffer = (i) => (
   {
-    id: index,
+    id: offersId[i],
     title: getRandomValue(titles),
     price: getRandomInteger(100, 300)
   }

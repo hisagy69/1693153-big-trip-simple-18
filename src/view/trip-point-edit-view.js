@@ -114,7 +114,7 @@ export default class TripPointEditView extends AbstractView {
 
   #formSubmitHandler = (event) => {
     event.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this.#point);
   };
 
   #formCloseHandler = () => {
