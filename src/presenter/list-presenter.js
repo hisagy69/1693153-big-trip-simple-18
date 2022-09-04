@@ -56,13 +56,13 @@ export default class ListPresenter {
   };
 
   #renderPoint = (point) => {
-    const pointPresenter = new PointPresenter(this.#tripPointsListComponent.element, this.#destinations, this.#offers, this.#resetPointList);
+    const pointPresenter = new PointPresenter(this.#tripPointsListComponent.element, this.#destinations, this.#offers, this.#handleModeChange);
     pointPresenter.init(point);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 
-  #resetPointList = () => {
-    this.#pointPresenter.forEach((presenter) => presenter.reset());
+  #handleModeChange = () => {
+    this.#pointPresenter.forEach((presenter) => presenter.resetView());
   };
 
   #clearPointList = () => {
