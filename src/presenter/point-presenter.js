@@ -12,11 +12,13 @@ export default class PointPresenter {
   #tripPointComponent = null;
   #tripEditComponent = null;
   #listContainer = null;
+  #resetAll = null;
 
-  constructor(listContainer, destinations, offersAll) {
+  constructor(listContainer, destinations, offersAll, resetAll) {
     this.#listContainer = listContainer;
     this.#destinations = destinations;
     this.#offersAll = offersAll;
+    this.#resetAll = resetAll;
   }
 
   init(point) {
@@ -75,6 +77,7 @@ export default class PointPresenter {
   };
 
   #handleClickCard = () => {
+    this.#resetAll();
     this.#replaceCardToForm();
     document.addEventListener('keydown', this.#onEscKeyDown);
   };
@@ -82,6 +85,12 @@ export default class PointPresenter {
   #handleFormSubmit = () => {
     this.#replaceFormToCard();
     document.removeEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  reset = () => {
+    if (this.#listContainer.contains(this.#tripEditComponent.element)) {
+      this.#replaceFormToCard();
+    }
   };
 
   destroy = () => {
