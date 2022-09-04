@@ -2,6 +2,11 @@ import TripPointEditView from '../view/trip-point-edit-view.js';
 import TripPointView from '../view/trip-point-view.js';
 import {replace, render, remove} from '../framework/render.js';
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITTING: 'EDITTING'
+};
+
 export default class PointPresenter {
   #offers = [];
   #offersAll = [];
@@ -12,13 +17,14 @@ export default class PointPresenter {
   #tripPointComponent = null;
   #tripEditComponent = null;
   #listContainer = null;
-  #resetAll = null;
+  #changeMode = null;
+  #mode = Mode.DEFAULT;
 
-  constructor(listContainer, destinations, offersAll, resetAll) {
+  constructor(listContainer, destinations, offersAll, changeMode) {
     this.#listContainer = listContainer;
     this.#destinations = destinations;
     this.#offersAll = offersAll;
-    this.#resetAll = resetAll;
+    this.#changeMode = changeMode;
   }
 
   init(point) {
@@ -43,11 +49,11 @@ export default class PointPresenter {
       return;
     }
 
-    if (this.#listContainer.contains(prevPointComponent.element)) {
+    if (this.#mode === Mode.DEFAULT) {
       replace(this.#tripEditComponent, this.#tripPointComponent);
     }
 
-    if (this.#listContainer.contains(prevEditComponent.element)) {
+    if (this.#mode === Mode.EDITTING) {
       replace(this.#tripPointComponent, this.#tripEditComponent);
     }
 
@@ -56,10 +62,13 @@ export default class PointPresenter {
   }
 
   #replaceCardToForm = () => {
+    this.#changeMode();
+    this.#mode = Mode.EDITTING;
     replace(this.#tripEditComponent, this.#tripPointComponent);
   };
 
   #replaceFormToCard = () => {
+    this.#mode = Mode.DEFAULT;
     replace(this.#tripPointComponent, this.#tripEditComponent);
   };
 
@@ -77,7 +86,6 @@ export default class PointPresenter {
   };
 
   #handleClickCard = () => {
-    this.#resetAll();
     this.#replaceCardToForm();
     document.addEventListener('keydown', this.#onEscKeyDown);
   };
@@ -87,8 +95,8 @@ export default class PointPresenter {
     document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
-  reset = () => {
-    if (this.#listContainer.contains(this.#tripEditComponent.element)) {
+  resetView = () => {
+    if (this.#mode === Mode.EDITTING) {
       this.#replaceFormToCard();
     }
   };
