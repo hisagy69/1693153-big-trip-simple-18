@@ -1,4 +1,5 @@
 import {getRandomValue} from '../utils/common';
+import {destinationsId} from './utils';
 
 const descriptions = [
   'Chamonix, is a beautiful city, a true asian pearl, with crowded streets.',
@@ -19,9 +20,9 @@ const generateImageLink = () => (
   }
 );
 
-export const generateDestination = (index) => (
+export const generateDestination = (i) => (
   {
-    id: index,
+    id: destinationsId[i],
     description: getRandomValue(descriptions),
     name: getRandomValue(names),
     pictures: Array.from({length: 5}, generateImageLink)

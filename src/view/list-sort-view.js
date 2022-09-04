@@ -9,7 +9,7 @@ const createListSortTemplate = () => (
           <input id="sort-${value}" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-${value}">
           <label class="trip-sort__btn" for="sort-${value}">${capitalizeFirstLetter(value)}</label>
         </div>
-      `))}
+      `)).join('')}
   </form>`
 );
 
