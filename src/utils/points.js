@@ -14,9 +14,7 @@ const sortPriceUp = (points) => {
 };
 
 const sortByDate = (points) => {
-  points.sort((point1, point2) => {
-    dayjs(point2.dateFrom).diff(dayjs(point1.dateFrom));
-  });
+  points.sort((point1, point2) => dayjs(point2.dateFrom).diff(dayjs(point1.dateFrom)));
 };
 
 const filter = {
