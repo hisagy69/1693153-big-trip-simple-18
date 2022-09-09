@@ -48,18 +48,18 @@ const createPointTemplate = (point, offersByType, destination) => {
 
 export default class TripPointView extends AbstractView {
   #point = null;
-  #offersByType = [];
   #destination = null;
+  #offers = [];
 
   constructor(point, offersByType, destination) {
     super();
     this.#point = point;
-    this.#offersByType = offersByType;
+    this.#offers = offersByType.filter((offer) => point.offers.find((item) => item.id === offer.id));
     this.#destination = destination;
   }
 
   get template() {
-    return createPointTemplate(this.#point, this.#offersByType, this.#destination);
+    return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
 
   setClickHandler = (callback) => {
