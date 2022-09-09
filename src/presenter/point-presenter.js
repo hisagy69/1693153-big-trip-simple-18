@@ -9,35 +9,28 @@ const Mode = {
 
 export default class PointPresenter {
   #offers = [];
-  #offersAll = [];
   #destinations = [];
   #point = null;
-  #destination = null;
-  #offersByType = null;
   #tripPointComponent = null;
   #tripEditComponent = null;
   #listContainer = null;
   #changeMode = null;
   #mode = Mode.DEFAULT;
 
-  constructor(listContainer, destinations, offersAll, changeMode) {
+  constructor(listContainer, destinations, offers, changeMode) {
     this.#listContainer = listContainer;
     this.#destinations = destinations;
-    this.#offersAll = offersAll;
+    this.#offers = offers;
     this.#changeMode = changeMode;
   }
 
   init(point) {
     this.#point = point;
-    this.#destination = this.#destinations.find((item) => item.id === point.destination);
-
-    this.#offersByType = this.#offersAll.find((item) => item.type === point.type);
-    this.#offers = this.#offersByType ? this.#offersByType.offers : [];
 
     const prevPointComponent = this.#tripPointComponent;
     const prevEditComponent = this.#tripEditComponent;
 
-    this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destination);
+    this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destinations);
 
     this.#tripPointComponent.setClickHandler(this.#handleClickCard);
 
@@ -84,7 +77,7 @@ export default class PointPresenter {
   };
 
   #addTripEditView = () => {
-    this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destination, this.#destinations);
+    this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destinations);
     this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
     this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
   };

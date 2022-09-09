@@ -3,6 +3,8 @@ import {TYPES} from '../const';
 import {
   humanizePointTime,
   humanizePointDateDMY,
+  getOffersByType,
+  getDestination
 } from '../utils/points';
 
 const createEventTypeTemplate = (type) => (`<div class="event__type-wrapper">
@@ -51,10 +53,10 @@ const createEventFieldPriceTemplate = (basePrice) => (`<div class="event__field-
     <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
   </div>`);
 
-const createEventAvailableOffersTemplate = (offersByType, pointOffers) => (`<section class="event__section  event__section--offers">
+const createEventAvailableOffersTemplate = (offers, pointOffers) => (`<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${offersByType.length > 0 ? offersByType.map((offer) => (`<div class="event__offer-selector">
+      ${offers.length > 0 ? offers.map((offer) => (`<div class="event__offer-selector">
             <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${pointOffers.find(({id}) => offer.id === id) ? 'checked' : ''}>
             <label class="event__offer-label" for="event-offer-luggage-1">
               <span class="event__offer-title">${offer.title}</span>
@@ -70,13 +72,13 @@ const createEventSectionDestinationTemplate = (destination) => (`<section class=
     <p class="event__destination-description">${destination.description}</p>
   </section>`);
 
-const createTripPointEditTemplate = (point, offersByType, destination, destinations) => {
+const createTripPointEditTemplate = (point, offers, destination, destinations) => {
   const {dateFrom, dateTo, type, basePrice} = point;
   const eventTypeTemplate = createEventTypeTemplate(type);
   const eventFieldDestination = createEventFieldDestinationTemplate(destinations, type, destination);
   const eventFieldTime = createEventFieldTimeTemplate(dateFrom, dateTo);
   const eventFieldPrice = createEventFieldPriceTemplate(basePrice);
-  const eventAvailableOffers = createEventAvailableOffersTemplate(offersByType, point.offers);
+  const eventAvailableOffers = createEventAvailableOffersTemplate(offers, point.offers);
   const eventSectionDestination = createEventSectionDestinationTemplate(destination);
 
   return (`<li class="trip-events__item">
@@ -108,22 +110,26 @@ const createTripPointEditTemplate = (point, offersByType, destination, destinati
 
 export default class TripPointEditView extends AbstractStatefulView {
   #point = null;
-  #offersByType = [];
+  #offers = [];
   #destination = null;
   #destinations = [];
   _state = null;
 
-  constructor(point, offersByType, destination, destinations) {
+  constructor(point, offersAll, destinations) {
     super();
     this.#point = point;
-    this.#offersByType = offersByType;
-    this.#destination = destination;
     this.#destinations = destinations;
+    this.#destination = getDestination(destinations, point);
+    this.#offers = getOffersByType(offersAll, point);
   }
 
   get template() {
-    return createTripPointEditTemplate(this.#point, this.#offersByType, this.#destination, this.#destinations);
+    return createTripPointEditTemplate(this.#point, this.#offers, this.#destination, this.#destinations);
   }
+
+  static parsePointToState = (point) => ({
+    ...point
+  });
 
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;

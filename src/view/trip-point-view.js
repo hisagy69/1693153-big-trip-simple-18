@@ -4,10 +4,12 @@ import {
   humanizePointDateNumber,
   humanizePointTime,
   getPointDateRFC,
-  isPointExpired
+  isPointExpired,
+  getOffersByType,
+  getDestination
 } from '../utils/points';
 
-const createPointTemplate = (point, offersByType, destination) => {
+const createPointTemplate = (point, offers, destination) => {
   const {dateFrom, dateTo, basePrice, type} = point;
 
   return (`<li class="trip-events__item">
@@ -29,7 +31,7 @@ const createPointTemplate = (point, offersByType, destination) => {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${offersByType.length > 0 ? offersByType.map((offer) => (`<li class="event__offer">
+        ${offers.length > 0 ? offers.map((offer) => (`<li class="event__offer">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
             <span class="event__offer-price">${offer.price}</span>
@@ -51,11 +53,11 @@ export default class TripPointView extends AbstractView {
   #destination = null;
   #offers = [];
 
-  constructor(point, offersByType, destination) {
+  constructor(point, offers, destinations) {
     super();
     this.#point = point;
-    this.#offers = offersByType.filter((offer) => point.offers.find((item) => item.id === offer.id));
-    this.#destination = destination;
+    this.#offers = getOffersByType(offers, point).filter((offer) => point.offers.find((item) => item.id === offer.id));
+    this.#destination = getDestination(destinations, point);
   }
 
   get template() {
