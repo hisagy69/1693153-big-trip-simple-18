@@ -33,7 +33,7 @@ const createEventFieldDestinationTemplate = (destinations, type, destination) =>
     </label>
     <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
     <datalist id="destination-list-1">
-      ${destinations.map((item) => (`<option value="${item.name}"></option>`)).join('')}
+      ${destinations.map((item) => (`<option value="${item.name}"></option>`)).join('')}}
     </datalist>
   </div>`);
 
@@ -72,13 +72,13 @@ const createEventSectionDestinationTemplate = (destination) => (`<section class=
     <p class="event__destination-description">${destination.description}</p>
   </section>`);
 
-const createTripPointEditTemplate = (point, offers, destination, destinations) => {
-  const {dateFrom, dateTo, type, basePrice} = point;
+const createTripPointEditTemplate = (data, destinations, offersByType) => {
+  const {dateFrom, dateTo, type, basePrice, destination, offers} = data;
   const eventTypeTemplate = createEventTypeTemplate(type);
   const eventFieldDestination = createEventFieldDestinationTemplate(destinations, type, destination);
   const eventFieldTime = createEventFieldTimeTemplate(dateFrom, dateTo);
   const eventFieldPrice = createEventFieldPriceTemplate(basePrice);
-  const eventAvailableOffers = createEventAvailableOffersTemplate(offers, point.offers);
+  const eventAvailableOffers = createEventAvailableOffersTemplate(offers, offersByType);
   const eventSectionDestination = createEventSectionDestinationTemplate(destination);
 
   return (`<li class="trip-events__item">
@@ -109,26 +109,25 @@ const createTripPointEditTemplate = (point, offers, destination, destinations) =
 };
 
 export default class TripPointEditView extends AbstractStatefulView {
-  #point = null;
-  #offers = [];
-  #destination = null;
-  #destinations = [];
   _state = null;
+  #offers = [];
+  #destinations = [];
 
-  constructor(point, offersAll, destinations) {
+  constructor(point, offers, destinations) {
     super();
-    this.#point = point;
+    this.#offers = offers;
     this.#destinations = destinations;
-    this.#destination = getDestination(destinations, point);
-    this.#offers = getOffersByType(offersAll, point);
+    this._state = TripPointEditView.parsePointToState(point, offers, destinations);
   }
 
   get template() {
-    return createTripPointEditTemplate(this.#point, this.#offers, this.#destination, this.#destinations);
+    return createTripPointEditTemplate(this._state, this.#destinations, this.#offers);
   }
 
-  static parsePointToState = (point) => ({
-    ...point
+  static parsePointToState = (point, offers, destinations) => ({
+    ...point,
+    offers: getOffersByType(offers, point),
+    destination: getDestination(destinations, point)
   });
 
   setFormSubmitHandler = (callback) => {
@@ -143,7 +142,7 @@ export default class TripPointEditView extends AbstractStatefulView {
 
   #formSubmitHandler = (event) => {
     event.preventDefault();
-    this._callback.formSubmit(this.#point);
+    this._callback.formSubmit();
   };
 
   #formCloseHandler = () => {
