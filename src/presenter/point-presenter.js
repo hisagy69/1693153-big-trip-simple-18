@@ -38,11 +38,8 @@ export default class PointPresenter {
     const prevEditComponent = this.#tripEditComponent;
 
     this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destination);
-    this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destination, this.#destinations);
 
     this.#tripPointComponent.setClickHandler(this.#handleClickCard);
-    this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
-    this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
 
     if (prevPointComponent === null || prevEditComponent === null) {
       render(this.#tripPointComponent, this.#listContainer);
@@ -70,6 +67,7 @@ export default class PointPresenter {
   #replaceFormToCard = () => {
     this.#mode = Mode.DEFAULT;
     replace(this.#tripPointComponent, this.#tripEditComponent);
+    remove(this.#tripEditComponent);
   };
 
   #onEscKeyDown = (event) => {
@@ -85,7 +83,14 @@ export default class PointPresenter {
     document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
+  #addTripEditView = () => {
+    this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destination, this.#destinations);
+    this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
+    this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
+  };
+
   #handleClickCard = () => {
+    this.#addTripEditView();
     this.#replaceCardToForm();
     document.addEventListener('keydown', this.#onEscKeyDown);
   };
