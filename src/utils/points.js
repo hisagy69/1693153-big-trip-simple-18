@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import {FilterType} from '../const';
 
-const humanizePointDate = (dueDate) => dayjs(dueDate).format('MMMM D').toUpperCase();
+const humanizePointDate = (dueDate) => dayjs(dueDate).format('MMMM D').slice(0, 3).toUpperCase();
 const humanizePointDateNumber = (dueDate) => dayjs(dueDate).format('YYYY-MM-DD');
 const humanizePointTime = (dueDate) => dayjs(dueDate).format('HH:mm');
 const getPointDateRFC = (dueDate) => dayjs(dueDate).format('YYYY-MM-DDTHH:mm');
