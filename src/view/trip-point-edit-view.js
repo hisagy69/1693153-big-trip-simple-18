@@ -57,20 +57,32 @@ const createEventFieldPriceTemplate = (basePrice) => (`<div class="event__field-
 const createEventAvailableOffersTemplate = (offers, pointOffers) => (`<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${offers.length > 0 ? offers.map((offer) => (`<div class="event__offer-selector">
+      ${offers.map((offer) => (`<div class="event__offer-selector">
             <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${pointOffers.find(({id}) => offer.id === id) ? 'checked' : ''}>
             <label class="event__offer-label" for="event-offer-luggage-1">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${offer.price}</span>
             </label>
-          </div>`)).join('') : ''}
+          </div>`)).join('')}
     </div>
   </section>`);
 
 const createEventSectionDestinationTemplate = (destination) => (`<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">${destination.description}</p>
+    ${
+      destination.description.length ?
+        `<p class="event__destination-description">${destination.description}</p>` : ''
+    }
+    ${
+      destination.pictures.length ?
+        `<div class="event__photos-container">
+          <div class="event__photos-tape">
+            ${destination.pictures.map(({src, description}) => (`<img class="event__photo" src="${src}" alt="${description}">`)).join('')}
+          </div>
+        </div>` : ''
+    }
+
   </section>`);
 
 const createTripPointEditTemplate = (data, destinations) => {
@@ -79,7 +91,7 @@ const createTripPointEditTemplate = (data, destinations) => {
   const eventFieldDestination = createEventFieldDestinationTemplate(destinations, type, destination);
   const eventFieldTime = createEventFieldTimeTemplate(dateFrom, dateTo);
   const eventFieldPrice = createEventFieldPriceTemplate(basePrice);
-  const eventAvailableOffers = createEventAvailableOffersTemplate(offersByType, offers);
+  const eventAvailableOffers = offersByType.length ? createEventAvailableOffersTemplate(offersByType, offers) : '';
   const eventSectionDestination = createEventSectionDestinationTemplate(destination);
 
   return (`<li class="trip-events__item">
