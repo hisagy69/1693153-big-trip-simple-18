@@ -27,9 +27,7 @@ const getOffersByType = (offers, type) => {
   return offersByType ? offersByType.offers : [];
 };
 
-const getOffersPointAvailable = (offers, offersPoint) => {
-  return offers.filter((offer) => offersPoint.find((id) => offer.id === id));
-};
+const getOffersPointAvailable = (offers, offersPoint) => (offers.filter((offer) => offersPoint.find((id) => offer.id === id)));
 
 const getDestination = (destinations, destination) => (destinations.find((item) => item.id === destination));
 

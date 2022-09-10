@@ -55,7 +55,7 @@ export default class TripPointView extends AbstractView {
   constructor(point, offers, destinations) {
     super();
     this.#point = point;
-    this.#offers = getOffersPointAvailable(getOffersByType(offers, point.type), point.offers),
+    this.#offers = getOffersPointAvailable(getOffersByType(offers, point.type), point.offers);
     this.#destination = getDestination(destinations, point.destination);
   }
 

@@ -112,13 +112,14 @@ const createTripPointEditTemplate = (data, destinations) => {
 export default class TripPointEditView extends AbstractStatefulView {
   _state = null;
   #destinations = [];
+  #offers = [];
 
   constructor(point, offers, destinations) {
     super();
     this.#destinations = destinations;
+    this.#offers = offers;
     this._state = TripPointEditView.parsePointToState(point, offers, destinations);
-    this.element.querySelector('.event__type-group')
-      .addEventListener('click', this.#pointTypeHandler);
+    this.#setInnerHandlers();
   }
 
   get template() {
@@ -160,8 +161,20 @@ export default class TripPointEditView extends AbstractStatefulView {
     if (typeInput) {
       this.updateElement({
         type: typeInput.value,
-        offers: []
+        offers: [],
+        offersByType: getOffersByType(this.#offers, typeInput.value)
       });
     }
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-group')
+      .addEventListener('click', this.#pointTypeHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setEditClickHandler(this._callback.formClose);
   };
 }
