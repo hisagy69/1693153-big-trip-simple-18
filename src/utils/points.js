@@ -22,12 +22,16 @@ const filter = {
   [FilterType.FUTURE]: (points) => points.filter((point) => isPointHasNotArrived(point.dateFrom))
 };
 
-const getOffersByType = (offers, point) => {
-  const offersByType = offers.find((item) => item.type === point.type);
+const getOffersByType = (offers, type) => {
+  const offersByType = offers.find((offer) => offer.type === type);
   return offersByType ? offersByType.offers : [];
 };
 
-const getDestination = (destinations, point) => (destinations.find((item) => item.id === point.destination));
+const getOffersPointAvailable = (offers, offersPoint) => {
+  return offers.filter((offer) => offersPoint.find((id) => offer.id === id));
+};
+
+const getDestination = (destinations, destination) => (destinations.find((item) => item.id === destination));
 
 export {
   humanizePointDate,
@@ -40,6 +44,7 @@ export {
   filter,
   sortPriceUp,
   sortByDate,
+  getOffersPointAvailable,
   getOffersByType,
   getDestination
 };

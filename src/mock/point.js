@@ -11,7 +11,7 @@ export const generatePoint = (destinationId) => (
     dateFrom: randomDate(),
     dateTo: randomDate(),
     destination: destinationId,
-    offers: offersId,
+    offers: offersId.slice(getRandomInteger(0, offersId.length), getRandomInteger(0, offersId.length)),
     type: getRandomValue(TYPES)
   }
 );

@@ -3,6 +3,7 @@ import {TYPES} from '../const';
 import {
   humanizePointTime,
   humanizePointDateDMY,
+  getOffersPointAvailable,
   getOffersByType,
   getDestination
 } from '../utils/points';
@@ -72,13 +73,13 @@ const createEventSectionDestinationTemplate = (destination) => (`<section class=
     <p class="event__destination-description">${destination.description}</p>
   </section>`);
 
-const createTripPointEditTemplate = (data, destinations, offersByType) => {
-  const {dateFrom, dateTo, type, basePrice, destination, offers} = data;
+const createTripPointEditTemplate = (data, destinations) => {
+  const {dateFrom, dateTo, type, basePrice, destination, offers, offersByType} = data;
   const eventTypeTemplate = createEventTypeTemplate(type);
   const eventFieldDestination = createEventFieldDestinationTemplate(destinations, type, destination);
   const eventFieldTime = createEventFieldTimeTemplate(dateFrom, dateTo);
   const eventFieldPrice = createEventFieldPriceTemplate(basePrice);
-  const eventAvailableOffers = createEventAvailableOffersTemplate(offers, offersByType);
+  const eventAvailableOffers = createEventAvailableOffersTemplate(offersByType, offers);
   const eventSectionDestination = createEventSectionDestinationTemplate(destination);
 
   return (`<li class="trip-events__item">
@@ -110,25 +111,30 @@ const createTripPointEditTemplate = (data, destinations, offersByType) => {
 
 export default class TripPointEditView extends AbstractStatefulView {
   _state = null;
-  #offers = [];
   #destinations = [];
 
   constructor(point, offers, destinations) {
     super();
-    this.#offers = offers;
     this.#destinations = destinations;
     this._state = TripPointEditView.parsePointToState(point, offers, destinations);
+    this.element.querySelector('.event__type-group')
+      .addEventListener('click', this.#pointTypeHandler);
   }
 
   get template() {
-    return createTripPointEditTemplate(this._state, this.#destinations, this.#offers);
+    return createTripPointEditTemplate(this._state, this.#destinations);
   }
 
-  static parsePointToState = (point, offers, destinations) => ({
-    ...point,
-    offers: getOffersByType(offers, point),
-    destination: getDestination(destinations, point)
-  });
+  static parsePointToState = (point, offers, destinations) => {
+    const offersByType = getOffersByType(offers, point.type);
+
+    return {
+      ...point,
+      offers: getOffersPointAvailable(offersByType, point.offers),
+      offersByType: offersByType,
+      destination: getDestination(destinations, point.destination)
+    };
+  };
 
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
@@ -147,5 +153,15 @@ export default class TripPointEditView extends AbstractStatefulView {
 
   #formCloseHandler = () => {
     this._callback.formClose();
+  };
+
+  #pointTypeHandler = (event) => {
+    const typeInput = event.target.closest('.event__type-input');
+    if (typeInput) {
+      this.updateElement({
+        type: typeInput.value,
+        offers: []
+      });
+    }
   };
 }

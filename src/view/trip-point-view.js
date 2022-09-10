@@ -6,7 +6,8 @@ import {
   getPointDateRFC,
   isPointExpired,
   getOffersByType,
-  getDestination
+  getDestination,
+  getOffersPointAvailable
 } from '../utils/points';
 
 const createPointTemplate = (point, offers, destination) => {
@@ -40,9 +41,7 @@ const createPointTemplate = (point, offers, destination) => {
           </li>`}
       </ul>
       <button class="event__rollup-btn" type="button">
-        <span class="visually-hidden">
-          ${isPointExpired ? 'Open' : 'Close'} event
-        </span>
+        <span class="visually-hidden">${isPointExpired(dateTo) ? 'Open' : 'Close'} event</span>
       </button>
     </div>
   </li>`);
@@ -56,8 +55,8 @@ export default class TripPointView extends AbstractView {
   constructor(point, offers, destinations) {
     super();
     this.#point = point;
-    this.#offers = getOffersByType(offers, point).filter((offer) => point.offers.find((item) => item.id === offer.id));
-    this.#destination = getDestination(destinations, point);
+    this.#offers = getOffersPointAvailable(getOffersByType(offers, point.type), point.offers),
+    this.#destination = getDestination(destinations, point.destination);
   }
 
   get template() {
