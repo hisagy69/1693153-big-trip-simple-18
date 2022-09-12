@@ -34,7 +34,7 @@ const createEventFieldDestinationTemplate = (destinations, type, destination) =>
     </label>
     <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
     <datalist id="destination-list-1">
-      ${destinations.map((item) => (`<option value="${item.name}"></option>`)).join('')}}
+      ${destinations.map((item) => (`<option value="${item.name}"></option>`)).join('')}
     </datalist>
   </div>`);
 
@@ -195,11 +195,19 @@ export default class TripPointEditView extends AbstractStatefulView {
     }
   };
 
+  #pointDestinationHandler = (event) => {
+    this.updateElement({
+      destination: this.#destinations.find((destination) => destination.name === event.target.value)
+    });
+  };
+
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-group')
       .addEventListener('click', this.#pointTypeHandler);
     this.element.querySelector('.event__available-offers')
       .addEventListener('click', this.#pointOfferHandler);
+    this.element.querySelector('#event-destination-1')
+      .addEventListener('change', this.#pointDestinationHandler);
   };
 
   _restoreHandlers = () => {
