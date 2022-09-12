@@ -3,7 +3,7 @@ import {TYPES} from '../const';
 import {
   humanizePointTime,
   humanizePointDateDMY,
-  getOffersPointAvailable,
+  getOffersPointSelected,
   getOffersByType,
   getDestination
 } from '../utils/points';
@@ -58,7 +58,7 @@ const createEventAvailableOffersTemplate = (offers, pointOffers) => (`<section c
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${offers.map((offer) => (`<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${pointOffers.find(({id}) => offer.id === id) ? 'checked' : ''}>
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" data-offer-id="${offer.id}" ${pointOffers.find(({id}) => offer.id === id) ? 'checked' : ''}>
             <label class="event__offer-label" for="event-offer-luggage-1">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
@@ -70,19 +70,12 @@ const createEventAvailableOffersTemplate = (offers, pointOffers) => (`<section c
 
 const createEventSectionDestinationTemplate = (destination) => (`<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    ${
-      destination.description.length ?
-        `<p class="event__destination-description">${destination.description}</p>` : ''
-    }
-    ${
-      destination.pictures.length ?
-        `<div class="event__photos-container">
+    ${destination.description.length ? `<p class="event__destination-description">${destination.description}</p>` : ''}
+    ${destination.pictures.length ? `<div class="event__photos-container">
           <div class="event__photos-tape">
             ${destination.pictures.map(({src, description}) => (`<img class="event__photo" src="${src}" alt="${description}">`)).join('')}
           </div>
-        </div>` : ''
-    }
-
+        </div>` : ''}
   </section>`);
 
 const createTripPointEditTemplate = (data, destinations) => {
@@ -143,7 +136,7 @@ export default class TripPointEditView extends AbstractStatefulView {
 
     return {
       ...point,
-      offers: getOffersPointAvailable(offersByType, point.offers),
+      offers: getOffersPointSelected(offersByType, point.offers),
       offersByType: offersByType,
       destination: getDestination(destinations, point.destination)
     };
@@ -170,6 +163,7 @@ export default class TripPointEditView extends AbstractStatefulView {
 
   #pointTypeHandler = (event) => {
     const typeInput = event.target.closest('.event__type-input');
+
     if (typeInput) {
       this.updateElement({
         type: typeInput.value,
@@ -179,9 +173,30 @@ export default class TripPointEditView extends AbstractStatefulView {
     }
   };
 
+  #pointOfferHandler = (event) => {
+    const selectedOfferItem = event.target.closest('.event__offer-checkbox');
+    const selectedOffer = selectedOfferItem ? this._state.offersByType.find((offer) => offer.id === selectedOfferItem.dataset.offerId) : null;
+
+    if (!selectedOffer) {
+      return;
+    }
+
+    if (!selectedOfferItem.checked) {
+      this._setState({
+        offers: [...this._state.offers, selectedOffer]
+      });
+    } else {
+      this._setState({
+        offers: this._state.offers.filter((offer) => offer.id !== selectedOffer.id)
+      });
+    }
+  };
+
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-group')
       .addEventListener('click', this.#pointTypeHandler);
+    this.element.querySelector('.event__available-offers')
+      .addEventListener('click', this.#pointOfferHandler);
   };
 
   _restoreHandlers = () => {

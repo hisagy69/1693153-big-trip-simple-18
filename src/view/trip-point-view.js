@@ -7,7 +7,7 @@ import {
   isPointExpired,
   getOffersByType,
   getDestination,
-  getOffersPointAvailable
+  getOffersPointSelected
 } from '../utils/points';
 
 const createPointTemplate = (point, offers, destination) => {
@@ -55,7 +55,7 @@ export default class TripPointView extends AbstractView {
   constructor(point, offers, destinations) {
     super();
     this.#point = point;
-    this.#offers = getOffersPointAvailable(getOffersByType(offers, point.type), point.offers);
+    this.#offers = getOffersPointSelected(getOffersByType(offers, point.type), point.offers);
     this.#destination = getDestination(destinations, point.destination);
   }
 
