@@ -58,8 +58,8 @@ const createEventAvailableOffersTemplate = (offers, pointOffers) => (`<section c
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${offers.map((offer) => (`<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" data-offer-id="${offer.id}" ${pointOffers.find(({id}) => offer.id === id) ? 'checked' : ''}>
-            <label class="event__offer-label" for="event-offer-luggage-1">
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${pointOffers.find(({id}) => offer.id === id) ? 'checked' : ''}>
+            <label class="event__offer-label" for="event-offer-luggage-1" data-offer-id="${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${offer.price}</span>
@@ -174,21 +174,24 @@ export default class TripPointEditView extends AbstractStatefulView {
   };
 
   #pointOfferHandler = (event) => {
-    const selectedOfferItem = event.target.closest('.event__offer-checkbox');
-    const selectedOffer = selectedOfferItem ? this._state.offersByType.find((offer) => offer.id === selectedOfferItem.dataset.offerId) : null;
-
-    if (!selectedOffer) {
+    const label = event.target.closest('label');
+    if (!label) {
       return;
     }
+    event.preventDefault();
 
-    if (!selectedOfferItem.checked) {
+    const selectedOffer = label ? this._state.offersByType.find((offer) => offer.id === label.dataset.offerId) : null;
+    const checkbox = label.parentNode.querySelector('input');
+    if (!checkbox.checked) {
       this._setState({
         offers: [...this._state.offers, selectedOffer]
       });
+      checkbox.checked = true;
     } else {
       this._setState({
         offers: this._state.offers.filter((offer) => offer.id !== selectedOffer.id)
       });
+      checkbox.checked = false;
     }
   };
 
