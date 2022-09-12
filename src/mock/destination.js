@@ -1,4 +1,4 @@
-import {getRandomValue} from '../utils/common';
+import {getRandomValue, getRandomInteger} from '../utils/common';
 import {destinationsId} from './utils';
 
 const descriptions = [
@@ -25,6 +25,6 @@ export const generateDestination = (i) => (
     id: destinationsId[i],
     description: getRandomValue(descriptions),
     name: getRandomValue(names),
-    pictures: Array.from({length: 5}, generateImageLink)
+    pictures: Array.from({length: getRandomInteger(0, 5)}, generateImageLink)
   }
 );

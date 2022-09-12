@@ -9,40 +9,30 @@ const Mode = {
 
 export default class PointPresenter {
   #offers = [];
-  #offersAll = [];
   #destinations = [];
   #point = null;
-  #destination = null;
-  #offersByType = null;
   #tripPointComponent = null;
   #tripEditComponent = null;
   #listContainer = null;
   #changeMode = null;
   #mode = Mode.DEFAULT;
 
-  constructor(listContainer, destinations, offersAll, changeMode) {
+  constructor(listContainer, destinations, offers, changeMode) {
     this.#listContainer = listContainer;
     this.#destinations = destinations;
-    this.#offersAll = offersAll;
+    this.#offers = offers;
     this.#changeMode = changeMode;
   }
 
   init(point) {
     this.#point = point;
-    this.#destination = this.#destinations.find((item) => item.id === point.destination);
-
-    this.#offersByType = this.#offersAll.find((item) => item.type === point.type);
-    this.#offers = this.#offersByType ? this.#offersByType.offers : [];
 
     const prevPointComponent = this.#tripPointComponent;
     const prevEditComponent = this.#tripEditComponent;
 
-    this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destination);
-    this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destination, this.#destinations);
+    this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destinations);
 
     this.#tripPointComponent.setClickHandler(this.#handleClickCard);
-    this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
-    this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
 
     if (prevPointComponent === null || prevEditComponent === null) {
       render(this.#tripPointComponent, this.#listContainer);
@@ -70,6 +60,7 @@ export default class PointPresenter {
   #replaceFormToCard = () => {
     this.#mode = Mode.DEFAULT;
     replace(this.#tripPointComponent, this.#tripEditComponent);
+    remove(this.#tripEditComponent);
   };
 
   #onEscKeyDown = (event) => {
@@ -85,7 +76,14 @@ export default class PointPresenter {
     document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
+  #addTripEditView = () => {
+    this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destinations);
+    this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
+    this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
+  };
+
   #handleClickCard = () => {
+    this.#addTripEditView();
     this.#replaceCardToForm();
     document.addEventListener('keydown', this.#onEscKeyDown);
   };

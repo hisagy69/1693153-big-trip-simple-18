@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import {FilterType} from '../const';
 
-const humanizePointDate = (dueDate) => dayjs(dueDate).format('MMMM D').toUpperCase();
+const humanizePointDate = (dueDate) => dayjs(dueDate).format('MMMM D').slice(0, 3).toUpperCase();
 const humanizePointDateNumber = (dueDate) => dayjs(dueDate).format('YYYY-MM-DD');
 const humanizePointTime = (dueDate) => dayjs(dueDate).format('HH:mm');
 const getPointDateRFC = (dueDate) => dayjs(dueDate).format('YYYY-MM-DDTHH:mm');
@@ -22,6 +22,15 @@ const filter = {
   [FilterType.FUTURE]: (points) => points.filter((point) => isPointHasNotArrived(point.dateFrom))
 };
 
+const getOffersByType = (offers, type) => {
+  const offersByType = offers.find((offer) => offer.type === type);
+  return offersByType ? offersByType.offers : [];
+};
+
+const getOffersPointSelected = (offers, offersPoint) => (offers.filter((offer) => offersPoint.find((id) => offer.id === id)));
+
+const getDestination = (destinations, destination) => (destinations.find((item) => item.id === destination));
+
 export {
   humanizePointDate,
   humanizePointDateNumber,
@@ -32,5 +41,8 @@ export {
   isPointHasNotArrived,
   filter,
   sortPriceUp,
-  sortByDate
+  sortByDate,
+  getOffersPointSelected,
+  getOffersByType,
+  getDestination
 };

@@ -4,10 +4,13 @@ import {
   humanizePointDateNumber,
   humanizePointTime,
   getPointDateRFC,
-  isPointExpired
+  isPointExpired,
+  getOffersByType,
+  getDestination,
+  getOffersPointSelected
 } from '../utils/points';
 
-const createPointTemplate = (point, offersByType, destination) => {
+const createPointTemplate = (point, offers, destination) => {
   const {dateFrom, dateTo, basePrice, type} = point;
 
   return (`<li class="trip-events__item">
@@ -29,7 +32,7 @@ const createPointTemplate = (point, offersByType, destination) => {
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${offersByType.length > 0 ? offersByType.map((offer) => (`<li class="event__offer">
+        ${offers.length > 0 ? offers.map((offer) => (`<li class="event__offer">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
             <span class="event__offer-price">${offer.price}</span>
@@ -38,9 +41,7 @@ const createPointTemplate = (point, offersByType, destination) => {
           </li>`}
       </ul>
       <button class="event__rollup-btn" type="button">
-        <span class="visually-hidden">
-          ${isPointExpired ? 'Open' : 'Close'} event
-        </span>
+        <span class="visually-hidden">${isPointExpired(dateTo) ? 'Open' : 'Close'} event</span>
       </button>
     </div>
   </li>`);
@@ -48,18 +49,18 @@ const createPointTemplate = (point, offersByType, destination) => {
 
 export default class TripPointView extends AbstractView {
   #point = null;
-  #offersByType = [];
   #destination = null;
+  #offers = [];
 
-  constructor(point, offersByType, destination) {
+  constructor(point, offers, destinations) {
     super();
     this.#point = point;
-    this.#offersByType = offersByType;
-    this.#destination = destination;
+    this.#offers = getOffersPointSelected(getOffersByType(offers, point.type), point.offers);
+    this.#destination = getDestination(destinations, point.destination);
   }
 
   get template() {
-    return createPointTemplate(this.#point, this.#offersByType, this.#destination);
+    return createPointTemplate(this.#point, this.#offers, this.#destination);
   }
 
   setClickHandler = (callback) => {
