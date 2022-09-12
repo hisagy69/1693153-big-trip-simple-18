@@ -1,12 +1,14 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {TYPES} from '../const';
 import {
-  humanizePointTime,
-  humanizePointDateDMY,
   getOffersPointSelected,
   getOffersByType,
-  getDestination
+  getDestination,
+  humanizePointTime,
+  humanizePointDateDMY
 } from '../utils/points';
+import 'flatpickr/dist/flatpickr.min.css';
+import flatpickr from 'flatpickr';
 
 const createEventTypeTemplate = (type) => (`<div class="event__type-wrapper">
     <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -118,6 +120,8 @@ export default class TripPointEditView extends AbstractStatefulView {
   _state = null;
   #destinations = [];
   #offers = [];
+  #datepickerFrom = null;
+  #datepickerTo = null;
 
   constructor(point, offers, destinations) {
     super();
@@ -125,6 +129,8 @@ export default class TripPointEditView extends AbstractStatefulView {
     this.#offers = offers;
     this._state = TripPointEditView.parsePointToState(point, offers, destinations);
     this.#setInnerHandlers();
+    this.#setDatepickerFrom();
+    this.#setDatepickerTo();
   }
 
   get template() {
@@ -196,8 +202,12 @@ export default class TripPointEditView extends AbstractStatefulView {
   };
 
   #pointDestinationHandler = (event) => {
+    const destination = this.#destinations.find((item) => item.name === event.target.value);
+    if (!destination) {
+      return;
+    }
     this.updateElement({
-      destination: this.#destinations.find((destination) => destination.name === event.target.value)
+      destination: destination
     });
   };
 
@@ -210,8 +220,57 @@ export default class TripPointEditView extends AbstractStatefulView {
       .addEventListener('change', this.#pointDestinationHandler);
   };
 
+  removeElement = () => {
+    super.removeElement();
+    if (this.#datepickerFrom || this.#datepickerTo) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerTo.destroy();
+      this.#datepickerFrom = null;
+      this.#datepickerTo = null;
+    }
+  };
+
+  #dateFromChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate
+    });
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate
+    });
+  };
+
+  #setDatepickerFrom = () => {
+    this.#datepickerFrom = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        default: this._state.dateFrom,
+        onChange: this.#dateFromChangeHandler
+      }
+    );
+  };
+
+  #setDatepickerTo = () => {
+    this.#datepickerTo = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        default: this._state.dateTo,
+        minDate: this._state.dateFrom,
+        onChange: this.#dateToChangeHandler
+      }
+    );
+  };
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
+    this.#setDatepickerFrom();
+    this.#setDatepickerTo();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setEditClickHandler(this._callback.formClose);
   };
