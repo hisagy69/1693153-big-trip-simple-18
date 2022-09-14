@@ -117,7 +117,6 @@ const createTripPointEditTemplate = (data, destinations) => {
 };
 
 export default class TripPointEditView extends AbstractStatefulView {
-  _state = null;
   #destinations = [];
   #offers = [];
   #datepickerFrom = null;
@@ -127,7 +126,7 @@ export default class TripPointEditView extends AbstractStatefulView {
     super();
     this.#destinations = destinations;
     this.#offers = offers;
-    this._state = TripPointEditView.parsePointToState(point, offers, destinations);
+    this._setState(TripPointEditView.parsePointToState(point, offers, destinations));
     this.#setInnerHandlers();
     this.#setDatepickerFrom();
     this.#setDatepickerTo();
