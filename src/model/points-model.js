@@ -29,6 +29,11 @@ export default class PointsModel extends Observable{
     this._notify(updateType, update);
   };
 
+  deletePoint = (updateType, update) => {
+    this.#points = this.#points.filter((point) => point.id !== update.id);
+    this._notify(updateType, update);
+  };
+
   get points() {
     return this.#points;
   }

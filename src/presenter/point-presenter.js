@@ -1,6 +1,7 @@
 import TripPointEditView from '../view/trip-point-edit-view.js';
 import TripPointView from '../view/trip-point-view.js';
 import {replace, render, remove} from '../framework/render.js';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -16,12 +17,14 @@ export default class PointPresenter {
   #listContainer = null;
   #changeMode = null;
   #mode = Mode.DEFAULT;
+  #changeData = null;
 
-  constructor(listContainer, destinations, offers, changeMode) {
+  constructor(listContainer, destinations, offers, changeData, changeMode) {
     this.#listContainer = listContainer;
     this.#destinations = destinations;
     this.#offers = offers;
     this.#changeMode = changeMode;
+    this.#changeData = changeData;
   }
 
   init(point) {
@@ -80,6 +83,11 @@ export default class PointPresenter {
     this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destinations);
     this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
     this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
+    this.#tripEditComponent.setDeletePointClickHandler(this.#handleDeleteCard)
+  };
+
+  #handleDeleteCard = () => {
+
   };
 
   #handleClickCard = () => {
@@ -88,9 +96,14 @@ export default class PointPresenter {
     document.addEventListener('keydown', this.#onEscKeyDown);
   };
 
-  #handleFormSubmit = () => {
+  #handleFormSubmit = (point) => {
     this.#replaceFormToCard();
     document.removeEventListener('keydown', this.#onEscKeyDown);
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      point
+    );
   };
 
   resetView = () => {

@@ -1,5 +1,4 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
-import {TYPES} from '../const';
 import {
   getOffersPointSelected,
   getOffersByType,
@@ -10,7 +9,7 @@ import {
 import 'flatpickr/dist/flatpickr.min.css';
 import flatpickr from 'flatpickr';
 
-const createEventTypeTemplate = (type) => (`<div class="event__type-wrapper">
+const createEventTypeTemplate = (type, offers) => (`<div class="event__type-wrapper">
     <label class="event__type  event__type-btn" for="event-type-toggle-1">
       <span class="visually-hidden">Choose event type</span>
       <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
@@ -20,10 +19,10 @@ const createEventTypeTemplate = (type) => (`<div class="event__type-wrapper">
     <div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
-        ${TYPES.map((item) => (`
+        ${offers.map((offer) => (`
             <div class="event__type-item">
-              <input id="event-type-${item}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item}">
-              <label class="event__type-label  event__type-label--${item}" for="event-type-${item}-1">${item}</label>
+              <input id="event-type-${offer.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${offer.type}">
+              <label class="event__type-label  event__type-label--${offer.type}" for="event-type-${offer.type}-1">${offer.type}</label>
             </div>
           `)).join('')}
       </fieldset>
@@ -80,9 +79,9 @@ const createEventSectionDestinationTemplate = (destination) => (`<section class=
         </div>` : ''}
   </section>`);
 
-const createTripPointEditTemplate = (data, destinations) => {
+const createTripPointEditTemplate = (data, destinations, offersAll) => {
   const {dateFrom, dateTo, type, basePrice, destination, offers, offersByType} = data;
-  const eventTypeTemplate = createEventTypeTemplate(type);
+  const eventTypeTemplate = createEventTypeTemplate(type, offersAll);
   const eventFieldDestination = createEventFieldDestinationTemplate(destinations, type, destination);
   const eventFieldTime = createEventFieldTimeTemplate(dateFrom, dateTo);
   const eventFieldPrice = createEventFieldPriceTemplate(basePrice);
@@ -133,7 +132,7 @@ export default class TripPointEditView extends AbstractStatefulView {
   }
 
   get template() {
-    return createTripPointEditTemplate(this._state, this.#destinations);
+    return createTripPointEditTemplate(this._state, this.#destinations, this.#offers);
   }
 
   static parsePointToState = (point, offers, destinations) => {
@@ -147,6 +146,16 @@ export default class TripPointEditView extends AbstractStatefulView {
     };
   };
 
+  static parseStateToPoint = (state) => {
+    const data = {
+      ...state,
+      offers: state.offers.map((offer) => offer.id),
+      destination: state.destination.id
+    };
+    delete data.offersByType;
+    return data;
+  };
+
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
@@ -157,9 +166,15 @@ export default class TripPointEditView extends AbstractStatefulView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formCloseHandler);
   };
 
+  setDeletePointClickHandler = (callback) => {
+    this._callback.deletePoint = callback;
+    this.element.querySelector('.event__reset-btn')
+      .addEventListener('click', this.#deletePointHandler);
+  };
+
   #formSubmitHandler = (event) => {
     event.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(TripPointEditView.parseStateToPoint(this._state));
   };
 
   #formCloseHandler = () => {
@@ -180,34 +195,31 @@ export default class TripPointEditView extends AbstractStatefulView {
 
   #pointOfferHandler = (event) => {
     const label = event.target.closest('label');
-    if (!label) {
-      return;
-    }
-    event.preventDefault();
-
-    const selectedOffer = label ? this._state.offersByType.find((offer) => offer.id === label.dataset.offerId) : null;
-    const checkbox = label.parentNode.querySelector('input');
-    if (!checkbox.checked) {
-      this._setState({
-        offers: [...this._state.offers, selectedOffer]
-      });
-      checkbox.checked = true;
-    } else {
-      this._setState({
-        offers: this._state.offers.filter((offer) => offer.id !== selectedOffer.id)
-      });
-      checkbox.checked = false;
+    if (label) {
+      event.preventDefault();
+      const selectedOffer = this._state.offersByType.find((offer) => offer.id === label.dataset.offerId);
+      const checkbox = label.parentNode.querySelector('input');
+      if (!checkbox.checked) {
+        this._setState({
+          offers: [...this._state.offers, selectedOffer]
+        });
+        checkbox.checked = true;
+      } else {
+        this._setState({
+          offers: this._state.offers.filter((offer) => offer.id !== selectedOffer.id)
+        });
+        checkbox.checked = false;
+      }
     }
   };
 
   #pointDestinationHandler = (event) => {
     const destination = this.#destinations.find((item) => item.name === event.target.value);
-    if (!destination) {
-      return;
+    if (destination) {
+      this.updateElement({
+        destination: destination
+      });
     }
-    this.updateElement({
-      destination: destination
-    });
   };
 
   #setInnerHandlers = () => {
@@ -266,11 +278,17 @@ export default class TripPointEditView extends AbstractStatefulView {
     );
   };
 
+  #deletePointHandler = () => {
+    this._callback.deletePoint();
+    this.removeElement();
+  };
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
     this.#setDatepickerFrom();
     this.#setDatepickerTo();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setEditClickHandler(this._callback.formClose);
+    this.setDeletePointClickHandler(this._callback.deletePoint);
   };
 }
