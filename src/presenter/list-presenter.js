@@ -12,7 +12,6 @@ export default class ListPresenter {
   #tripPointsListComponent = new TripPointsListView();
   #listEmptyComponent = new ListEmptyView();
 
-  #changeData = null;
   #listContainer = null;
   #pointsModel = null;
   #offersModel = null;
@@ -21,10 +20,6 @@ export default class ListPresenter {
   #destinations = [];
   #pointPresenter = new Map();
   #currentSortType = SortType.DAY;
-
-  constructor(changeData) {
-    this.#changeData = changeData;
-  }
 
   init = (listContainer, pointsModel, offersModel, destinationsModel) => {
     this.#listContainer = listContainer;
@@ -86,7 +81,7 @@ export default class ListPresenter {
   };
 
   #renderListSort = () => {
-    this.#listSortComponent = new ListSortView(SortType.DAY)
+    this.#listSortComponent = new ListSortView(this.#currentSortType);
     render(this.#listSortComponent, this.#listContainer);
   };
 
@@ -105,7 +100,6 @@ export default class ListPresenter {
     } else {
       this.#renderListEmpty();
     }
-    this.#renderListSort();
   };
 
   #renderPoint = (point) => {
@@ -115,35 +109,27 @@ export default class ListPresenter {
   };
 
   #handleSortTypeChange = (sortType) => {
-    if (sortType === this.#currentSortType) {
-      return;
+    if (sortType !== this.#currentSortType) {
+      this.#currentSortType = sortType;
+      this.#clearPointList();
+      this.#renderPoints();
     }
-    this.#currentSortType = sortType;
-    this.#clearPointList(true);
-    this.#renderPoints();
   };
 
   #handleModeChange = () => {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
   };
 
-  #handleArchiveClick = (id) => {
-    this.#changeData(
-      UserAction.DELETE_POINT,
-      UpdateType.MINOR,
-      this.points.filter((point) => point.id !== id)
-    );
-  };
-
   #clearPointList = (resetSortType = false) => {
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
     this.#pointPresenter.clear();
 
-    remove(this.#listSortComponent);
     remove(this.#listEmptyComponent);
 
+    this.#listSortComponent = null;
+
     if (resetSortType) {
-      this.#currentSortType = SortType.DAY
+      this.#currentSortType = SortType.DAY;
     }
   };
 }

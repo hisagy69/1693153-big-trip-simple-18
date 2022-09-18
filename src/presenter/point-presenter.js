@@ -31,27 +31,14 @@ export default class PointPresenter {
     this.#point = point;
 
     const prevPointComponent = this.#tripPointComponent;
-    const prevEditComponent = this.#tripEditComponent;
 
     this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destinations);
 
     this.#tripPointComponent.setClickHandler(this.#handleClickCard);
 
-    if (prevPointComponent === null || prevEditComponent === null) {
-      render(this.#tripPointComponent, this.#listContainer);
-      return;
-    }
-
-    if (this.#mode === Mode.DEFAULT) {
-      replace(this.#tripEditComponent, this.#tripPointComponent);
-    }
-
-    if (this.#mode === Mode.EDITTING) {
-      replace(this.#tripPointComponent, this.#tripEditComponent);
-    }
+    render(this.#tripPointComponent, this.#listContainer);
 
     remove(prevPointComponent);
-    remove(prevEditComponent);
   }
 
   #replaceCardToForm = () => {
@@ -81,13 +68,17 @@ export default class PointPresenter {
 
   #addTripEditView = () => {
     this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destinations);
-    this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
     this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#tripEditComponent.setDeletePointClickHandler(this.#handleDeleteCard)
+    this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
+    this.#tripEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
   };
 
-  #handleDeleteCard = () => {
-
+  #handleDeleteClick = (point) => {
+    this.#changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point
+    );
   };
 
   #handleClickCard = () => {
@@ -97,13 +88,17 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (point) => {
-    this.#replaceFormToCard();
-    document.removeEventListener('keydown', this.#onEscKeyDown);
+    const isMinorUpdate =
+      this.#point.basePrice !== point.basePrice ||
+      this.#point.dateFrom !== point.dateFrom;
+
     this.#changeData(
       UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       point
     );
+    this.#replaceFormToCard();
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   resetView = () => {

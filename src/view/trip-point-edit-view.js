@@ -127,8 +127,6 @@ export default class TripPointEditView extends AbstractStatefulView {
     this.#offers = offers;
     this._setState(TripPointEditView.parsePointToState(point, offers, destinations));
     this.#setInnerHandlers();
-    this.#setDatepickerFrom();
-    this.#setDatepickerTo();
   }
 
   get template() {
@@ -166,8 +164,8 @@ export default class TripPointEditView extends AbstractStatefulView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formCloseHandler);
   };
 
-  setDeletePointClickHandler = (callback) => {
-    this._callback.deletePoint = callback;
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
     this.element.querySelector('.event__reset-btn')
       .addEventListener('click', this.#deletePointHandler);
   };
@@ -222,13 +220,30 @@ export default class TripPointEditView extends AbstractStatefulView {
     }
   };
 
+  #pointPriceHandler = (event) => {
+    const price = event.target.value;
+    if (typeof +price === 'number') {
+      this._setState({
+        basePrice: price
+      });
+    }
+  };
+
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-group')
       .addEventListener('click', this.#pointTypeHandler);
     this.element.querySelector('.event__available-offers')
       .addEventListener('click', this.#pointOfferHandler);
-    this.element.querySelector('#event-destination-1')
-      .addEventListener('change', this.#pointDestinationHandler);
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('input', this.#pointDestinationHandler);
+    this.element.querySelector('.event__input--price')
+      .addEventListener('input', this.#pointPriceHandler);
+
+    this.#setDatepickerFrom();
+    this.#setDatepickerTo();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setEditClickHandler(this._callback.formClose);
+    this.setDeleteClickHandler(this._callback.deleteClick);
   };
 
   removeElement = () => {
@@ -279,16 +294,10 @@ export default class TripPointEditView extends AbstractStatefulView {
   };
 
   #deletePointHandler = () => {
-    this._callback.deletePoint();
-    this.removeElement();
+    this._callback.deleteClick(TripPointEditView.parseStateToPoint(this._state));
   };
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
-    this.#setDatepickerFrom();
-    this.#setDatepickerTo();
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setEditClickHandler(this._callback.formClose);
-    this.setDeletePointClickHandler(this._callback.deletePoint);
   };
 }
