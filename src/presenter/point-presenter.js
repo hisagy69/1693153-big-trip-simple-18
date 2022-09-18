@@ -31,13 +31,18 @@ export default class PointPresenter {
     this.#point = point;
 
     const prevPointComponent = this.#tripPointComponent;
-
     this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destinations);
-
     this.#tripPointComponent.setClickHandler(this.#handleClickCard);
 
-    render(this.#tripPointComponent, this.#listContainer);
+    if (prevPointComponent === null) {
+      render(this.#tripPointComponent, this.#listContainer);
+      return;
+    }
+    if (this.#mode === Mode.EDITTING) {
+      this.#mode = Mode.DEFAULT;
 
+      render(this.#tripPointComponent, this.#listContainer);
+    }
     remove(prevPointComponent);
   }
 

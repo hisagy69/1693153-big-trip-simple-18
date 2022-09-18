@@ -3,36 +3,37 @@ import ListSortView from '../view/list-sort-view.js';
 import TripPointsListView from '../view/trip-points-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import {remove, render} from '../framework/render.js';
-import {sortPriceUp, sortByDate} from '../utils/points.js';
+import {sortPriceUp, sortByDate, filter} from '../utils/points.js';
 import {SortType} from '../const.js';
 import {UserAction, UpdateType} from '../const.js';
 
 export default class ListPresenter {
   #listSortComponent = null;
-  #tripPointsListComponent = new TripPointsListView();
-  #listEmptyComponent = new ListEmptyView();
+  #tripPointsListComponent = null;
+  #listEmptyComponent = null;
 
   #listContainer = null;
   #pointsModel = null;
   #offersModel = null;
+  #filterModel = null;
   #destinationsModel = null;
-  #offers = [];
-  #destinations = [];
+
   #pointPresenter = new Map();
   #currentSortType = SortType.DAY;
 
-  init = (listContainer, pointsModel, offersModel, destinationsModel) => {
+  constructor(listContainer, pointsModel, offersModel, filterModel, destinationsModel) {
     this.#listContainer = listContainer;
 
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
-
-    this.#offers = this.#offersModel.offers;
-    this.#destinations = this.#destinationsModel.destinations;
+    this.#filterModel = filterModel;
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
+  }
 
+  init = () => {
     this.#renderListSort();
 
     this.#listSortComponent.setSortChangeHandler(this.#handleSortTypeChange);
@@ -41,13 +42,14 @@ export default class ListPresenter {
   };
 
   get points() {
+    const filterPoints = filter[this.#filterModel.filter](this.#pointsModel.points);
     switch (this.#currentSortType) {
       case SortType.DAY :
-        return sortByDate(this.#pointsModel.points);
+        return sortByDate(filterPoints);
       case SortType.PRICE :
-        return sortPriceUp(this.#pointsModel.points);
+        return sortPriceUp(filterPoints);
     }
-    return this.#pointsModel.points;
+    return filterPoints;
   }
 
   #handleViewAction = (actionType, updateType, update) => {
@@ -86,10 +88,12 @@ export default class ListPresenter {
   };
 
   #renderPointsList = () => {
+    this.#tripPointsListComponent = new TripPointsListView();
     render(this.#tripPointsListComponent, this.#listContainer);
   };
 
   #renderListEmpty = () => {
+    this.#listEmptyComponent = new ListEmptyView();
     render(this.#listEmptyComponent, this.#listContainer);
   };
 
@@ -103,7 +107,7 @@ export default class ListPresenter {
   };
 
   #renderPoint = (point) => {
-    const pointPresenter = new PointPresenter(this.#tripPointsListComponent.element, this.#destinations, this.#offers, this.#handleViewAction, this.#handleModeChange);
+    const pointPresenter = new PointPresenter(this.#tripPointsListComponent.element, this.#destinationsModel.destinations, this.#offersModel.offers, this.#handleViewAction, this.#handleModeChange);
     pointPresenter.init(point);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
