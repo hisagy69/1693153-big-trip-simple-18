@@ -72,7 +72,7 @@ export default class PointPresenter {
   };
 
   #addTripEditView = () => {
-    this.#tripEditComponent = new TripPointEditView(this.#point, this.#offers, this.#destinations);
+    this.#tripEditComponent = new TripPointEditView(this.#offers, this.#destinations, this.#point);
     this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
     this.#tripEditComponent.setDeleteClickHandler(this.#handleDeleteClick);

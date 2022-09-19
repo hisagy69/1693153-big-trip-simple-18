@@ -8,4 +8,14 @@ export default class PointAddButtonView extends AbstractView {
   get template() {
     return createPointAddButtonTemplate();
   }
+
+  setClickHandler = (calback) => {
+    this._callback.addPointButton = calback;
+    this.element.addEventListener('click', this.#addPointClickHandler);
+  };
+
+  #addPointClickHandler = (event) => {
+    event.preventDefault();
+    this._callback.addPointButton();
+  };
 }

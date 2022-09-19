@@ -11,6 +11,7 @@ const pointsModel = new PointsModel();
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
 const filterModel = new FilterModel();
+const pointAddButtonComponent = new PointAddButtonView();
 
 const tripMain = document.querySelector('.trip-main');
 const tripEvents = document.querySelector('.trip-events');
@@ -19,7 +20,17 @@ const tripControlsFilters = document.querySelector('.trip-controls__filters');
 const filterPresenter = new FilterPresenter(tripControlsFilters, filterModel, pointsModel);
 const listPresenter = new ListPresenter(tripEvents, pointsModel, offersModel, filterModel, destinationsModel);
 
-render(new PointAddButtonView(), tripMain);
+const handleNewPointButtonClose = () => {
+  pointAddButtonComponent.element.disabled = false;
+};
+
+const handleNewPointButtonClick = () => {
+  listPresenter.createPoint(handleNewPointButtonClose);
+  pointAddButtonComponent.element.disabled = true;
+};
+
+render(pointAddButtonComponent, tripMain);
+pointAddButtonComponent.setClickHandler(handleNewPointButtonClick);
 
 filterPresenter.init();
 listPresenter.init();

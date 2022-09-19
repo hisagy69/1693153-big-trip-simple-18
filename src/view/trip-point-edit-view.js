@@ -9,6 +9,11 @@ import {
 import 'flatpickr/dist/flatpickr.min.css';
 import flatpickr from 'flatpickr';
 
+const Mode = {
+  ADDING: 'ADDING',
+  EDITTING: 'EDITTING'
+};
+
 const createEventTypeTemplate = (type, offers) => (`<div class="event__type-wrapper">
     <label class="event__type  event__type-btn" for="event-type-toggle-1">
       <span class="visually-hidden">Choose event type</span>
@@ -33,7 +38,7 @@ const createEventFieldDestinationTemplate = (destinations, type, destination) =>
     <label class="event__label  event__type-output" for="event-destination-1">
       ${type}
     </label>
-    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination?.name || ''}" list="destination-list-1">
     <datalist id="destination-list-1">
       ${destinations.map((item) => (`<option value="${item.name}"></option>`)).join('')}
     </datalist>
@@ -59,7 +64,7 @@ const createEventAvailableOffersTemplate = (offers, pointOffers) => (`<section c
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
       ${offers.map((offer) => (`<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${pointOffers.find(({id}) => offer.id === id) ? 'checked' : ''}>
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${pointOffers?.find(({id}) => offer.id === id) ? 'checked' : ''}>
             <label class="event__offer-label" for="event-offer-luggage-1" data-offer-id="${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
@@ -71,15 +76,15 @@ const createEventAvailableOffersTemplate = (offers, pointOffers) => (`<section c
 
 const createEventSectionDestinationTemplate = (destination) => (`<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    ${destination.description.length ? `<p class="event__destination-description">${destination.description}</p>` : ''}
-    ${destination.pictures.length ? `<div class="event__photos-container">
+    ${destination?.description.length ? `<p class="event__destination-description">${destination.description}</p>` : ''}
+    ${destination?.pictures.length ? `<div class="event__photos-container">
           <div class="event__photos-tape">
             ${destination.pictures.map(({src, description}) => (`<img class="event__photo" src="${src}" alt="${description}">`)).join('')}
           </div>
         </div>` : ''}
   </section>`);
 
-const createTripPointEditTemplate = (data, destinations, offersAll) => {
+const createTripPointEditTemplate = (destinations, offersAll, data, mode) => {
   const {dateFrom, dateTo, type, basePrice, destination, offers, offersByType} = data;
   const eventTypeTemplate = createEventTypeTemplate(type, offersAll);
   const eventFieldDestination = createEventFieldDestinationTemplate(destinations, type, destination);
@@ -100,7 +105,7 @@ const createTripPointEditTemplate = (data, destinations, offersAll) => {
         ${eventFieldPrice}
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
+        <button class="event__reset-btn" type="reset">${mode === Mode.EDITTING ? 'Delete' : 'Cancel'}</button>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>
@@ -120,27 +125,40 @@ export default class TripPointEditView extends AbstractStatefulView {
   #offers = [];
   #datepickerFrom = null;
   #datepickerTo = null;
+  #mode = null;
 
-  constructor(point, offers, destinations) {
+  constructor(offers, destinations, point) {
     super();
     this.#destinations = destinations;
     this.#offers = offers;
-    this._setState(TripPointEditView.parsePointToState(point, offers, destinations));
+    this._setState(TripPointEditView.parsePointToState(offers, destinations, point));
+    this.#mode = point ? Mode.EDITTING : Mode.ADDING;
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createTripPointEditTemplate(this._state, this.#destinations, this.#offers);
+    return createTripPointEditTemplate(this.#destinations, this.#offers, this._state, this.#mode);
   }
 
-  static parsePointToState = (point, offers, destinations) => {
-    const offersByType = getOffersByType(offers, point.type);
+  static parsePointToState = (offers, destinations, point) => {
+    if (point) {
+      const offersByType = getOffersByType(offers, point.type);
 
+      return {
+        ...point,
+        offers: getOffersPointSelected(offersByType, point.offers),
+        offersByType: offersByType,
+        destination: getDestination(destinations, point.destination)
+      };
+    }
+    const date = new Date().now;
     return {
-      ...point,
-      offers: getOffersPointSelected(offersByType, point.offers),
-      offersByType: offersByType,
-      destination: getDestination(destinations, point.destination)
+      offers: [],
+      type: offers[0].type,
+      offersByType: offers[0].offers,
+      basePrice: 0,
+      dateFrom: date,
+      dateTo: date
     };
   };
 
@@ -294,7 +312,11 @@ export default class TripPointEditView extends AbstractStatefulView {
   };
 
   #deletePointHandler = () => {
-    this._callback.deleteClick(TripPointEditView.parseStateToPoint(this._state));
+    if (this.#mode === Mode.EDITTING) {
+      this._callback.deleteClick(TripPointEditView.parseStateToPoint(this._state));
+      return;
+    }
+    this._callback.deleteClick();
   };
 
   _restoreHandlers = () => {
