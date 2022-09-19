@@ -31,7 +31,6 @@ export default class ListFilterView extends AbstractView {
   };
 
   #filterTypeChangeHandler = (event) => {
-    console.log('change')
     event.preventDefault();
     this._callback.filterTypeChange(event.target.value);
   };
