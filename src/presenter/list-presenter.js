@@ -111,7 +111,7 @@ export default class ListPresenter {
   };
 
   #renderListEmpty = () => {
-    this.#listEmptyComponent = new ListEmptyView();
+    this.#listEmptyComponent = new ListEmptyView(this.#filterModel.filter);
     render(this.#listEmptyComponent, this.#listContainer);
   };
 
