@@ -239,8 +239,9 @@ export default class TripPointEditView extends AbstractStatefulView {
   };
 
   #pointPriceHandler = (event) => {
-    const price = event.target.value;
-    if (typeof +price === 'number') {
+    const price = parseFloat(event.target.value);
+    event.target.value = price;
+    if (price) {
       this._setState({
         basePrice: price
       });
