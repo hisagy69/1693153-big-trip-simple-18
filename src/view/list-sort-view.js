@@ -1,10 +1,10 @@
 import AbstractView from '../framework/view/abstract-view';
 import {SortType} from '../const';
 
-const createListSortTemplate = () => (
+const createListSortTemplate = (sortType) => (
   `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
     <div class="trip-sort__item  trip-sort__item--day">
-      <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day">
+      <input id="sort-day" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-day" ${sortType === SortType.DAY ? 'checked' : ''}>
       <label class="trip-sort__btn" for="sort-day" data-sort-type="${SortType.DAY}">Day</label>
     </div>
 
@@ -19,7 +19,7 @@ const createListSortTemplate = () => (
     </div>
 
     <div class="trip-sort__item  trip-sort__item--price">
-      <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price" checked>
+      <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price" ${sortType === SortType.PRICE ? 'checked' : ''}>
       <label class="trip-sort__btn" for="sort-price" data-sort-type="${SortType.PRICE}">Price</label>
     </div>
 
@@ -31,8 +31,15 @@ const createListSortTemplate = () => (
 );
 
 export default class ListSortView extends AbstractView{
+  #sortType = null;
+
+  constructor (sortType) {
+    super();
+    this.#sortType = sortType;
+  }
+
   get template() {
-    return createListSortTemplate();
+    return createListSortTemplate(this.#sortType);
   }
 
   setSortChangeHandler = (callback) => {

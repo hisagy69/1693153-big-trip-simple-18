@@ -1,6 +1,6 @@
 import {getRandomInteger, getRandomValue} from '../utils/common';
 import {offersId} from './utils';
-import {TYPES} from '../const';
+import {TYPES} from './const';
 
 const titles = [
   'Upgrade to a business class',

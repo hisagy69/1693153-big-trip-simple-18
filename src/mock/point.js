@@ -1,4 +1,4 @@
-import {TYPES} from '../const';
+import {TYPES} from './const';
 import {nanoid} from 'nanoid';
 import {getRandomValue, getRandomInteger} from '../utils/common';
 import {offersId} from './utils';
