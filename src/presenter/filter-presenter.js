@@ -1,4 +1,3 @@
-import {FilterType} from '../const';
 import ListFilterView from '../view/list-filter-view';
 import {remove, render, replace} from '../framework/render';
 import {UpdateType} from '../const';
@@ -36,7 +35,7 @@ export default class FilterPresenter {
     const filters = this.filters;
     const prevFilterComponent = this.#filterComponent;
 
-    this.#filterComponent = new ListFilterView(filters, FilterType.EVERYTHING);
+    this.#filterComponent = new ListFilterView(filters, this.#filterModel.filter);
     this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
 
     if (prevFilterComponent === null) {
