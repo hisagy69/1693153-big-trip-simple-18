@@ -1,6 +1,5 @@
 import {remove, render, RenderPosition} from '../framework/render';
 import TripPointEditView from '../view/trip-point-edit-view';
-import {nanoid} from 'nanoid';
 import {UpdateType, UserAction} from '../const';
 
 export default class PointNewPresenter {
@@ -8,15 +7,13 @@ export default class PointNewPresenter {
   #changeData = null;
   #tripEditComponent = null;
   #destroyCallback = null;
-  #offersModel = null;
-  #destinationsModel = null;
+  #pointsModel = null;
 
-  constructor(listContainer, offersModel, destinationsModel, changeData) {
+  constructor(listContainer, pointsModel, changeData) {
     this.#listContainer = listContainer;
     this.#changeData = changeData;
 
-    this.#offersModel = offersModel;
-    this.#destinationsModel = destinationsModel;
+    this.#pointsModel = pointsModel;
   }
 
   init = (callback) => {
@@ -25,7 +22,7 @@ export default class PointNewPresenter {
     if (this.#tripEditComponent !== null) {
       return;
     }
-    this.#tripEditComponent = new TripPointEditView(this.#offersModel.offers, this.#destinationsModel.destinations);
+    this.#tripEditComponent = new TripPointEditView(this.#pointsModel.offers, this.#pointsModel.destinations);
     this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#tripEditComponent.setEditClickHandler(this.#handleClose);
     this.#tripEditComponent.setDeleteClickHandler(this.#handleClose);
@@ -35,11 +32,10 @@ export default class PointNewPresenter {
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
-  #handleFormSubmit = (point) => {
+  #handleFormSubmit = () => {
     this.#changeData(
       UserAction.ADD_POINT,
-      UpdateType.MINOR,
-      {id: nanoid(), ...point}
+      UpdateType.MINOR
     );
   };
 
