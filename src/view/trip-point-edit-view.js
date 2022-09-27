@@ -165,10 +165,11 @@ export default class TripPointEditView extends AbstractStatefulView {
   static parseStateToPoint = (state) => {
     const data = {
       ...state,
-      offers: state.offers.map((offer) => offer.id),
+      offers: state.offers.map((offer) => offer?.id),
       destination: state.destination.id
     };
     delete data.offersByType;
+
     return data;
   };
 
@@ -213,7 +214,7 @@ export default class TripPointEditView extends AbstractStatefulView {
     const label = event.target.closest('label');
     if (label) {
       event.preventDefault();
-      const selectedOffer = this._state.offersByType.find((offer) => offer.id === label.dataset.offerId);
+      const selectedOffer = this._state.offersByType.find((offer) => offer.id === +label.dataset.offerId);
       const checkbox = label.parentNode.querySelector('input');
       if (!checkbox.checked) {
         this._setState({
@@ -251,8 +252,10 @@ export default class TripPointEditView extends AbstractStatefulView {
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-group')
       .addEventListener('click', this.#pointTypeHandler);
-    this.element.querySelector('.event__available-offers')
-      .addEventListener('click', this.#pointOfferHandler);
+    if (this._state.offersByType.length > 0) {
+      this.element.querySelector('.event__available-offers')
+        .addEventListener('click', this.#pointOfferHandler);
+    }
     this.element.querySelector('.event__input--destination')
       .addEventListener('input', this.#pointDestinationHandler);
     this.element.querySelector('.event__input--price')

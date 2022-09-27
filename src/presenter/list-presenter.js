@@ -32,7 +32,11 @@ export default class ListPresenter {
     this.#filterModel = filterModel;
 
     this.#renderPointsList();
-    this.#pointNewPresenter = new PointNewPresenter(this.#tripPointsListComponent.element, this.#pointsModel, this.#handleViewAction);
+    this.#pointNewPresenter = new PointNewPresenter(
+      this.#tripPointsListComponent.element,
+      this.#pointsModel,
+      this.#handleViewAction);
+
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
@@ -141,7 +145,13 @@ export default class ListPresenter {
   };
 
   #renderPoint = (point) => {
-    const pointPresenter = new PointPresenter(this.#tripPointsListComponent.element, this.#pointsModel.destinations, this.#pointsModel.offers, this.#handleViewAction, this.#handleModeChange);
+    const pointPresenter = new PointPresenter(
+      this.#tripPointsListComponent.element,
+      this.#pointsModel.destinations,
+      this.#pointsModel.offers,
+      this.#handleViewAction,
+      this.#handleModeChange);
+
     pointPresenter.init(point);
     this.#pointPresenter.set(point.id, pointPresenter);
   };

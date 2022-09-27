@@ -7,7 +7,7 @@ import FilterPresenter from './presenter/filter-presenter';
 import PointsApiService from './point-api-service';
 
 const AUTHORIZATION = 'Basic kqRSTujsauA';
-const END_POINT = 'https://18.ecmascript.pages.academy/big-trip/';
+const END_POINT = 'https://18.ecmascript.pages.academy/big-trip';
 
 const pointsModel = new PointsModel(new PointsApiService(END_POINT, AUTHORIZATION));
 const filterModel = new FilterModel();
