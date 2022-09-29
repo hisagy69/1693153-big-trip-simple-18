@@ -19,9 +19,7 @@ export default class PointsModel extends Observable{
       this.#destinations = await this.#pointApiService.destinations;
       this.#offers = await this.#pointApiService.offers;
     } catch (err) {
-      this.#points = [];
-      this.#destinations = [];
-      this.#offers = [];
+      throw new Error('Can\'t get response points');
     }
 
     this._notify(UpdateType.INIT);
@@ -74,9 +72,14 @@ export default class PointsModel extends Observable{
     }
   };
 
-  deletePoint = (updateType, update) => {
-    this.#points = this.#points.filter((point) => point.id !== update.id);
-    this._notify(updateType, update);
+  deletePoint = async (updateType, update) => {
+    try {
+      await this.#pointApiService.deletePoint(update);
+      this.#points = this.#points.filter((point) => point.id !== update.id);
+      this._notify(updateType, update);
+    } catch(err) {
+      throw new Error('Can\'t delete point');
+    }
   };
 
   #adaptToClient = (point) => {
