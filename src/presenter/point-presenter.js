@@ -34,15 +34,8 @@ export default class PointPresenter {
     this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destinations);
     this.#tripPointComponent.setClickHandler(this.#handleClickCard);
 
-    if (prevPointComponent === null) {
-      render(this.#tripPointComponent, this.#listContainer);
-      return;
-    }
-    if (this.#mode === Mode.EDITTING) {
-      this.#mode = Mode.DEFAULT;
+    render(this.#tripPointComponent, this.#listContainer);
 
-      render(this.#tripPointComponent, this.#listContainer);
-    }
     remove(prevPointComponent);
   }
 
@@ -96,7 +89,6 @@ export default class PointPresenter {
     const isMinorUpdate =
       this.#point.basePrice !== point.basePrice ||
       this.#point.dateFrom !== point.dateFrom;
-
     this.#changeData(
       UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,

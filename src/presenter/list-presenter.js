@@ -3,6 +3,7 @@ import PointNewPresenter from './point-new-presenter.js';
 import ListSortView from '../view/list-sort-view.js';
 import TripPointsListView from '../view/trip-points-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
+import LoadView from '../view/load-view';
 import {remove, render, replace, RenderPosition} from '../framework/render.js';
 import {sortPriceUp, sortByDate, filter} from '../utils/points.js';
 import {FilterType, SortType} from '../const.js';
@@ -12,37 +13,36 @@ export default class ListPresenter {
   #listSortComponent = null;
   #tripPointsListComponent = null;
   #listEmptyComponent = null;
+  #loadComponent = new LoadView();
+  #isLoading = true;
 
   #listContainer = null;
   #pointsModel = null;
-  #offersModel = null;
   #filterModel = null;
-  #destinationsModel = null;
   #filterPoints = [];
   #pointNewPresenter = null;
 
   #pointPresenter = new Map();
   #currentSortType = SortType.DAY;
 
-  constructor(listContainer, pointsModel, offersModel, filterModel, destinationsModel) {
+  constructor(listContainer, pointsModel, filterModel) {
     this.#listContainer = listContainer;
 
     this.#pointsModel = pointsModel;
-    this.#offersModel = offersModel;
-    this.#destinationsModel = destinationsModel;
     this.#filterModel = filterModel;
 
     this.#renderPointsList();
-    this.#pointNewPresenter = new PointNewPresenter(this.#tripPointsListComponent.element, this.#offersModel, this.#destinationsModel, this.#handleViewAction);
+    this.#pointNewPresenter = new PointNewPresenter(
+      this.#tripPointsListComponent.element,
+      this.#pointsModel,
+      this.#handleViewAction);
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   init = () => {
-    this.#renderListSort();
-    this.#listSortComponent.setSortChangeHandler(this.#handleSortTypeChange);
-    this.#renderPoints();
+    this.#renderBoard();
   };
 
   get points() {
@@ -83,18 +83,28 @@ export default class ListPresenter {
         break;
       case UpdateType.MINOR :
         this.#clearPointList();
-        this.#renderPoints();
+        this.#renderBoard();
         break;
       case UpdateType.MAJOR :
         this.#clearPointList(true);
-        this.#renderPoints();
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT :
+        this.#isLoading = false;
+        remove(this.#loadComponent);
+        this.#renderBoard();
         break;
     }
+  };
+
+  #renderLoading = () => {
+    render(this.#loadComponent, this.#listContainer);
   };
 
   #renderListSort = () => {
     this.#listSortComponent = new ListSortView(this.#currentSortType);
     render(this.#listSortComponent, this.#listContainer, RenderPosition.AFTERBEGIN);
+    this.#listSortComponent.setSortChangeHandler(this.#handleSortTypeChange);
   };
 
   #resetSort = () => {
@@ -111,11 +121,22 @@ export default class ListPresenter {
   };
 
   #renderListEmpty = () => {
+    remove(this.#loadComponent);
+    remove(this.#listSortComponent);
+    remove(this.#tripPointsListComponent);
     this.#listEmptyComponent = new ListEmptyView(this.#filterModel.filter);
     render(this.#listEmptyComponent, this.#listContainer);
   };
 
-  #renderPoints = () => {
+  #renderBoard = () => {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
+    if (!this.#listSortComponent) {
+      this.#renderListSort();
+    }
     if (this.points.length > 0) {
       this.points.forEach((point) => this.#renderPoint(point));
     } else {
@@ -124,7 +145,13 @@ export default class ListPresenter {
   };
 
   #renderPoint = (point) => {
-    const pointPresenter = new PointPresenter(this.#tripPointsListComponent.element, this.#destinationsModel.destinations, this.#offersModel.offers, this.#handleViewAction, this.#handleModeChange);
+    const pointPresenter = new PointPresenter(
+      this.#tripPointsListComponent.element,
+      this.#pointsModel.destinations,
+      this.#pointsModel.offers,
+      this.#handleViewAction,
+      this.#handleModeChange);
+
     pointPresenter.init(point);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
@@ -133,7 +160,7 @@ export default class ListPresenter {
     if (sortType !== this.#currentSortType) {
       this.#currentSortType = sortType;
       this.#clearPointList();
-      this.#renderPoints();
+      this.#renderBoard();
     }
   };
 
