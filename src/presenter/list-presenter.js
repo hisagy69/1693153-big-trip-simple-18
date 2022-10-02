@@ -4,6 +4,7 @@ import ListSortView from '../view/list-sort-view.js';
 import TripPointsListView from '../view/trip-points-list-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import LoadView from '../view/load-view';
+import ErrorLoadView from '../view/error-load-view';
 import {remove, render, replace, RenderPosition} from '../framework/render.js';
 import {sortPriceUp, sortByDate, filter} from '../utils/points.js';
 import {FilterType, SortType} from '../const.js';
@@ -14,6 +15,7 @@ export default class ListPresenter {
   #tripPointsListComponent = null;
   #listEmptyComponent = null;
   #loadComponent = new LoadView();
+  #errorLoadComponent = null;
   #isLoading = true;
 
   #listContainer = null;
@@ -94,11 +96,21 @@ export default class ListPresenter {
         remove(this.#loadComponent);
         this.#renderBoard();
         break;
+      case UpdateType.ERROR :
+        this.#isLoading = false;
+        remove(this.#loadComponent);
+        this.#errorLoadComponent = new ErrorLoadView();
+        this.#renderErrorLoad();
+        break;
     }
   };
 
   #renderLoading = () => {
     render(this.#loadComponent, this.#listContainer);
+  };
+
+  #renderErrorLoad = () => {
+    render(this.#errorLoadComponent, this.#listContainer);
   };
 
   #renderListSort = () => {
