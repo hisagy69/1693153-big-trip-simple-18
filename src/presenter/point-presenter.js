@@ -34,9 +34,13 @@ export default class PointPresenter {
     this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destinations);
     this.#tripPointComponent.setClickHandler(this.#handleClickCard);
 
-    render(this.#tripPointComponent, this.#listContainer);
+    if (!prevPointComponent) {
+      render(this.#tripPointComponent, this.#listContainer);
+      remove(prevPointComponent);
+      return;
+    }
 
-    remove(prevPointComponent);
+    replace(this.#tripPointComponent, prevPointComponent);
   }
 
   #replaceCardToForm = () => {
