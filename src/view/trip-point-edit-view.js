@@ -73,12 +73,12 @@ const createEventAvailableOffersTemplate = (offers, pointOffers, isDisabled) => 
       ${offers.map((offer) => (`<div class="event__offer-selector">
             <input
               class="event__offer-checkbox  visually-hidden"
-              id="event-offer-luggage-1"
+              id="event-offer-${offer.id}-1"
               type="checkbox"
-              name="event-offer-luggage"
+              name="event-offer-${offer.id}"
               ${pointOffers?.find(({id}) => offer.id === id) ? 'checked' : ''}
               ${isDisabled ? 'disabled' : ''}>
-            <label class="event__offer-label" for="event-offer-luggage-1" data-offer-id="${offer.id}">
+            <label class="event__offer-label" for="event-offer-${offer.id}-1" data-offer-id="${offer.id}">
               <span class="event__offer-title">${offer.title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${offer.price}</span>
@@ -249,19 +249,16 @@ export default class TripPointEditView extends AbstractStatefulView {
   #pointOfferHandler = (event) => {
     const label = event.target.closest('label');
     if (label) {
-      event.preventDefault();
       const selectedOffer = this._state.offersByType.find((offer) => offer.id === +label.dataset.offerId);
       const checkbox = label.parentNode.querySelector('input');
       if (!checkbox.checked) {
         this._setState({
           offers: [...this._state.offers, selectedOffer]
         });
-        checkbox.checked = true;
       } else {
         this._setState({
           offers: this._state.offers.filter((offer) => offer.id !== selectedOffer.id)
         });
-        checkbox.checked = false;
       }
     }
   };
