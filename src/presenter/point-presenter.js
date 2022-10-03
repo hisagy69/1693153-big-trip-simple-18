@@ -27,17 +27,51 @@ export default class PointPresenter {
     this.#changeData = changeData;
   }
 
-  init(point) {
+  init = (point) => {
     this.#point = point;
 
     const prevPointComponent = this.#tripPointComponent;
     this.#tripPointComponent = new TripPointView(this.#point, this.#offers, this.#destinations);
     this.#tripPointComponent.setClickHandler(this.#handleClickCard);
 
-    render(this.#tripPointComponent, this.#listContainer);
+    if (!prevPointComponent) {
+      render(this.#tripPointComponent, this.#listContainer);
+      remove(prevPointComponent);
+      return;
+    }
 
-    remove(prevPointComponent);
-  }
+    replace(this.#tripPointComponent, prevPointComponent);
+  };
+
+  setSaving = () => {
+    if (this.#mode === Mode.EDITTING) {
+      this.#tripEditComponent.updateElement({
+        isSaving: true,
+        isDisabled: true
+      });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#mode === Mode.EDITTING) {
+      this.#tripEditComponent.updateElement({
+        isDeleting: true,
+        isDisabled: true
+      });
+    }
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#tripEditComponent.updateElement({
+        isSaving: false,
+        isDeleting: false,
+        isDisabled: false
+      });
+    };
+
+    this.#tripEditComponent.shake(resetFormState);
+  };
 
   #replaceCardToForm = () => {
     this.#changeMode();
@@ -94,8 +128,6 @@ export default class PointPresenter {
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       point
     );
-    this.#replaceFormToCard();
-    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   resetView = () => {

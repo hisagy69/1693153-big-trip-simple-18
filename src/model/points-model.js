@@ -19,6 +19,7 @@ export default class PointsModel extends Observable{
       this.#destinations = await this.#pointApiService.destinations;
       this.#offers = await this.#pointApiService.offers;
     } catch (err) {
+      this._notify(UpdateType.ERROR);
       throw new Error('Can\'t get response points');
     }
 
