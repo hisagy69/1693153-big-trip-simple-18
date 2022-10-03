@@ -14,7 +14,7 @@ const Mode = {
   EDITTING: 'EDITTING'
 };
 
-const createEventTypeTemplate = (type, offers, isDisabled) => (`<div class="event__type-wrapper">
+const createEventTypeTemplate = (type, typesAvailable, isDisabled) => (`<div class="event__type-wrapper">
     <label class="event__type  event__type-btn" for="event-type-toggle-1">
       <span class="visually-hidden">Choose event type</span>
       <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
@@ -24,10 +24,10 @@ const createEventTypeTemplate = (type, offers, isDisabled) => (`<div class="even
     <div class="event__type-list">
       <fieldset class="event__type-group">
         <legend class="visually-hidden">Event type</legend>
-        ${offers.map((offer) => (`
+        ${typesAvailable.map((typeAvailable) => (`
             <div class="event__type-item">
-              <input id="event-type-${offer.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${offer.type}">
-              <label class="event__type-label  event__type-label--${offer.type}" for="event-type-${offer.type}-1">${offer.type}</label>
+              <input id="event-type-${typeAvailable}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${typeAvailable}">
+              <label class="event__type-label  event__type-label--${typeAvailable}" for="event-type-${typeAvailable}-1">${typeAvailable}</label>
             </div>
           `)).join('')}
       </fieldset>
@@ -97,7 +97,7 @@ const createEventSectionDestinationTemplate = (destination) => (`<section class=
         </div>` : ''}
   </section>`);
 
-const createTripPointEditTemplate = (destinations, offersAll, data, mode) => {
+const createTripPointEditTemplate = (destinations, typesAvailable, data, mode) => {
   const {
     dateFrom,
     dateTo,
@@ -111,7 +111,7 @@ const createTripPointEditTemplate = (destinations, offersAll, data, mode) => {
     isDeleting
   } = data;
 
-  const eventTypeTemplate = createEventTypeTemplate(type, offersAll, isDisabled);
+  const eventTypeTemplate = createEventTypeTemplate(type, typesAvailable, isDisabled);
   const eventFieldDestination = createEventFieldDestinationTemplate(destinations, type, destination, isDisabled);
   const eventFieldTime = createEventFieldTimeTemplate(dateFrom, dateTo, isDisabled);
   const eventFieldPrice = createEventFieldPriceTemplate(basePrice, isDisabled);
@@ -152,18 +152,20 @@ export default class TripPointEditView extends AbstractStatefulView {
   #datepickerFrom = null;
   #datepickerTo = null;
   #mode = null;
+  #typesAvailable = [];
 
   constructor(offers, destinations, point) {
     super();
     this.#destinations = destinations;
     this.#offers = offers;
+    this.#typesAvailable = this.#offers.map((item) => item.type);
     this._setState(TripPointEditView.parsePointToState(offers, destinations, point));
     this.#mode = point ? Mode.EDITTING : Mode.ADDING;
     this.#setInnerHandlers();
   }
 
   get template() {
-    return createTripPointEditTemplate(this.#destinations, this.#offers, this._state, this.#mode);
+    return createTripPointEditTemplate(this.#destinations, this.#typesAvailable, this._state, this.#mode);
   }
 
   static parsePointToState = (offers, destinations, point) => {
