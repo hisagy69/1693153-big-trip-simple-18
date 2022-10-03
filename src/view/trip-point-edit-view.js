@@ -117,7 +117,7 @@ const createTripPointEditTemplate = (destinations, offersAll, data, mode) => {
   const eventFieldPrice = createEventFieldPriceTemplate(basePrice, isDisabled);
   const eventAvailableOffers = offersByType.length ? createEventAvailableOffersTemplate(offersByType, offers, isDisabled) : '';
   const eventSectionDestination = createEventSectionDestinationTemplate(destination);
-  const deleteTextButton = isDeleting ? 'Deleting...' : 'Delete'
+  const deleteTextButton = isDeleting ? 'Deleting...' : 'Delete';
 
   return (`<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -180,7 +180,8 @@ export default class TripPointEditView extends AbstractStatefulView {
         isDeleting: false
       };
     }
-    const date = new Date().now;
+    const date = Date.now();
+
     return {
       offers: [],
       type: offers[0].type,
@@ -197,10 +198,11 @@ export default class TripPointEditView extends AbstractStatefulView {
       offers: state.offers.map((offer) => offer?.id),
       destination: state.destination?.id
     };
+
     delete data.offersByType;
-    delete data.isDisabled
-    delete data.isSaving,
-    delete data.isDeleting
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
 
     return data;
   };

@@ -6,9 +6,15 @@ import ListEmptyView from '../view/list-empty-view.js';
 import LoadView from '../view/load-view';
 import ErrorLoadView from '../view/error-load-view';
 import {remove, render, replace, RenderPosition} from '../framework/render.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
 import {sortPriceUp, sortByDate, filter} from '../utils/points.js';
 import {FilterType, SortType} from '../const.js';
 import {UserAction, UpdateType} from '../const.js';
+
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000
+};
 
 export default class ListPresenter {
   #listSortComponent = null;
@@ -26,6 +32,8 @@ export default class ListPresenter {
 
   #pointPresenter = new Map();
   #currentSortType = SortType.DAY;
+
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   constructor(listContainer, pointsModel, filterModel) {
     this.#listContainer = listContainer;
@@ -65,6 +73,7 @@ export default class ListPresenter {
   };
 
   #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_POINT :
         this.#pointPresenter.get(update.id).setSaving();
@@ -91,6 +100,7 @@ export default class ListPresenter {
         }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
