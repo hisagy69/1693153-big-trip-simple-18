@@ -2,9 +2,9 @@ import AbstractView from '../framework/view/abstract-view';
 
 const createListFilterTemplate = (filters, currentFilter) => (
   `<form class="trip-filters" action="#" method="get">
-    ${(filters).map(({type, name}) =>
+    ${(filters).map(({type, name, isActive}) =>
     (`<div class="trip-filters__filter">
-        <input id="filter-${type}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${type}" ${currentFilter === type ? 'checked' : ''}>
+        <input id="filter-${type}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${type}" ${currentFilter === type ? 'checked' : ''} ${!isActive ? 'disabled' : ''}>
         <label class="trip-filters__filter-label" for="filter-${type}">${name}</label>
       </div>`)).join('')}
     <button class="visually-hidden" type="submit">Accept filter</button>

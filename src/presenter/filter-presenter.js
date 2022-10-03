@@ -1,6 +1,7 @@
 import ListFilterView from '../view/list-filter-view';
 import {remove, render, replace} from '../framework/render';
 import {UpdateType} from '../const';
+import {filter} from '../utils/points';
 
 export default class FilterPresenter {
   #filterContainer = null;
@@ -22,11 +23,13 @@ export default class FilterPresenter {
     return [
       {
         type: 'everithing',
-        name: 'EVERITHING'
+        name: 'EVERITHING',
+        isActive: true
       },
       {
         type: 'future',
-        name: 'FUTURE'
+        name: 'FUTURE',
+        isActive: filter['future'](this.#pointsModel.points).length > 0
       }
     ];
   }
