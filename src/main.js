@@ -29,10 +29,11 @@ const handleNewPointButtonClick = () => {
   pointAddButtonComponent.element.disabled = true;
 };
 
+
 filterPresenter.init();
 listPresenter.init();
 pointsModel.init()
+  .then(() => render(pointAddButtonComponent, tripMain))
   .finally(() => {
-    render(pointAddButtonComponent, tripMain);
     pointAddButtonComponent.setClickHandler(handleNewPointButtonClick);
   });
