@@ -51,6 +51,17 @@ export default class PointNewPresenter {
     this.#tripEditComponent.shake(resetFormState);
   };
 
+  destroy = () => {
+    if (this.#tripEditComponent === null) {
+      return;
+    }
+
+    this.#destroyCallback?.();
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    remove(this.#tripEditComponent);
+    this.#tripEditComponent = null;
+  };
+
   #handleFormSubmit = (point) => {
     this.#changeData(
       UserAction.ADD_POINT,
@@ -61,17 +72,6 @@ export default class PointNewPresenter {
 
   #handleClose = () => {
     this.destroy();
-  };
-
-  destroy = () => {
-    if (this.#tripEditComponent === null) {
-      return;
-    }
-
-    this.#destroyCallback?.();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-    remove(this.#tripEditComponent);
-    this.#tripEditComponent = null;
   };
 
   #escKeyDownHandler = (event) => {

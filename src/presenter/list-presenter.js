@@ -51,10 +51,6 @@ export default class ListPresenter {
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
-  init = () => {
-    this.#renderBoard();
-  };
-
   get points() {
     this.#filterPoints = filter[this.#filterModel.filter](this.#pointsModel.points);
     switch (this.#currentSortType) {
@@ -66,68 +62,14 @@ export default class ListPresenter {
     return this.#filterPoints;
   }
 
+  init = () => {
+    this.#renderBoard();
+  };
+
   createPoint = (callback) => {
     this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#pointNewPresenter.init(callback);
-  };
-
-  #handleViewAction = async (actionType, updateType, update) => {
-    this.#uiBlocker.block();
-    switch (actionType) {
-      case UserAction.UPDATE_POINT :
-        this.#pointPresenter.get(update.id).setSaving();
-        try {
-          await this.#pointsModel.updatePoint(updateType, update);
-        } catch(err) {
-          this.#pointPresenter.get(update.id).setAborting();
-        }
-        break;
-      case UserAction.ADD_POINT :
-        this.#pointNewPresenter.setSaving();
-        try {
-          await this.#pointsModel.addPoint(updateType, update);
-        } catch(err) {
-          this.#pointNewPresenter.setAborting();
-        }
-        break;
-      case UserAction.DELETE_POINT :
-        this.#pointPresenter.get(update.id).setDeleting();
-        try {
-          await this.#pointsModel.deletePoint(updateType, update);
-        } catch(err) {
-          this.#pointPresenter.get(update.id).setAborting();
-        }
-        break;
-    }
-    this.#uiBlocker.unblock();
-  };
-
-  #handleModelEvent = (updateType, data) => {
-    switch (updateType) {
-      case UpdateType.PATCH :
-        this.#pointPresenter.get(data.id).init(data);
-        break;
-      case UpdateType.MINOR :
-        this.#clearPointList();
-        this.#renderBoard();
-        break;
-      case UpdateType.MAJOR :
-        this.#clearPointList(true);
-        this.#renderBoard();
-        break;
-      case UpdateType.INIT :
-        this.#isLoading = false;
-        remove(this.#loadComponent);
-        this.#renderBoard();
-        break;
-      case UpdateType.ERROR :
-        this.#isLoading = false;
-        remove(this.#loadComponent);
-        this.#errorLoadComponent = new ErrorLoadView();
-        this.#renderErrorLoad();
-        break;
-    }
   };
 
   #renderLoading = () => {
@@ -193,19 +135,6 @@ export default class ListPresenter {
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 
-  #handleSortTypeChange = (sortType) => {
-    if (sortType !== this.#currentSortType) {
-      this.#currentSortType = sortType;
-      this.#clearPointList();
-      this.#renderBoard();
-    }
-  };
-
-  #handleModeChange = () => {
-    this.#pointNewPresenter.destroy();
-    this.#pointPresenter.forEach((presenter) => presenter.resetView());
-  };
-
   #clearPointList = (resetSortType = false) => {
     this.#pointNewPresenter.destroy();
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
@@ -219,5 +148,76 @@ export default class ListPresenter {
       this.#currentSortType = SortType.DAY;
       this.#resetSort();
     }
+  };
+
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+    switch (actionType) {
+      case UserAction.UPDATE_POINT :
+        this.#pointPresenter.get(update.id).setSaving();
+        try {
+          await this.#pointsModel.updatePoint(updateType, update);
+        } catch(err) {
+          this.#pointPresenter.get(update.id).setAborting();
+        }
+        break;
+      case UserAction.ADD_POINT :
+        this.#pointNewPresenter.setSaving();
+        try {
+          await this.#pointsModel.addPoint(updateType, update);
+        } catch(err) {
+          this.#pointNewPresenter.setAborting();
+        }
+        break;
+      case UserAction.DELETE_POINT :
+        this.#pointPresenter.get(update.id).setDeleting();
+        try {
+          await this.#pointsModel.deletePoint(updateType, update);
+        } catch(err) {
+          this.#pointPresenter.get(update.id).setAborting();
+        }
+        break;
+    }
+    this.#uiBlocker.unblock();
+  };
+
+  #handleModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH :
+        this.#pointPresenter.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR :
+        this.#clearPointList();
+        this.#renderBoard();
+        break;
+      case UpdateType.MAJOR :
+        this.#clearPointList(true);
+        this.#renderBoard();
+        break;
+      case UpdateType.INIT :
+        this.#isLoading = false;
+        remove(this.#loadComponent);
+        this.#renderBoard();
+        break;
+      case UpdateType.ERROR :
+        this.#isLoading = false;
+        remove(this.#loadComponent);
+        this.#errorLoadComponent = new ErrorLoadView();
+        this.#renderErrorLoad();
+        break;
+    }
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (sortType !== this.#currentSortType) {
+      this.#currentSortType = sortType;
+      this.#clearPointList();
+      this.#renderBoard();
+    }
+  };
+
+  #handleModeChange = () => {
+    this.#pointNewPresenter.destroy();
+    this.#pointPresenter.forEach((presenter) => presenter.resetView());
   };
 }

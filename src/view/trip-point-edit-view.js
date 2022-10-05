@@ -168,45 +168,8 @@ export default class TripPointEditView extends AbstractStatefulView {
     return createTripPointEditTemplate(this.#destinations, this.#typesAvailable, this._state, this.#mode);
   }
 
-  static parsePointToState = (offers, destinations, point) => {
-    if (point) {
-      const offersByType = getOffersByType(offers, point.type);
-
-      return {
-        ...point,
-        offers: getOffersPointSelected(offersByType, point.offers),
-        offersByType: offersByType,
-        destination: getDestination(destinations, point.destination),
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false
-      };
-    }
-    const date = Date.now();
-
-    return {
-      offers: [],
-      type: offers[0].type,
-      offersByType: offers[0].offers,
-      basePrice: 0,
-      dateFrom: date,
-      dateTo: date
-    };
-  };
-
-  static parseStateToPoint = (state) => {
-    const data = {
-      ...state,
-      offers: state.offers.map((offer) => offer?.id),
-      destination: state.destination?.id
-    };
-
-    delete data.offersByType;
-    delete data.isDisabled;
-    delete data.isSaving;
-    delete data.isDeleting;
-
-    return data;
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
   };
 
   setFormSubmitHandler = (callback) => {
@@ -225,6 +188,60 @@ export default class TripPointEditView extends AbstractStatefulView {
       .addEventListener('click', this.#deletePointHandler);
   };
 
+  removeElement = () => {
+    super.removeElement();
+    if (this.#datepickerFrom || this.#datepickerTo) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerTo.destroy();
+      this.#datepickerFrom = null;
+      this.#datepickerTo = null;
+    }
+  };
+
+  #setDatepickerFrom = () => {
+    this.#datepickerFrom = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        default: this._state.dateFrom,
+        onChange: this.#dateFromChangeHandler
+      }
+    );
+  };
+
+  #setDatepickerTo = () => {
+    this.#datepickerTo = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        default: this._state.dateTo,
+        minDate: this._state.dateFrom,
+        onChange: this.#dateToChangeHandler
+      }
+    );
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-group')
+      .addEventListener('click', this.#pointTypeHandler);
+    if (this._state.offersByType.length > 0) {
+      this.element.querySelector('.event__available-offers')
+        .addEventListener('click', this.#pointOfferHandler);
+    }
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('input', this.#pointDestinationHandler);
+    this.element.querySelector('.event__input--price')
+      .addEventListener('input', this.#pointPriceHandler);
+
+    this.#setDatepickerFrom();
+    this.#setDatepickerTo();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setEditClickHandler(this._callback.formClose);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+  };
+
   #formSubmitHandler = (event) => {
     event.preventDefault();
     this._callback.formSubmit(TripPointEditView.parseStateToPoint(this._state));
@@ -233,6 +250,7 @@ export default class TripPointEditView extends AbstractStatefulView {
   #formCloseHandler = () => {
     this._callback.formClose();
   };
+
 
   #pointTypeHandler = (event) => {
     const typeInput = event.target.closest('.event__type-input');
@@ -281,35 +299,6 @@ export default class TripPointEditView extends AbstractStatefulView {
     });
   };
 
-  #setInnerHandlers = () => {
-    this.element.querySelector('.event__type-group')
-      .addEventListener('click', this.#pointTypeHandler);
-    if (this._state.offersByType.length > 0) {
-      this.element.querySelector('.event__available-offers')
-        .addEventListener('click', this.#pointOfferHandler);
-    }
-    this.element.querySelector('.event__input--destination')
-      .addEventListener('input', this.#pointDestinationHandler);
-    this.element.querySelector('.event__input--price')
-      .addEventListener('input', this.#pointPriceHandler);
-
-    this.#setDatepickerFrom();
-    this.#setDatepickerTo();
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setEditClickHandler(this._callback.formClose);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-  };
-
-  removeElement = () => {
-    super.removeElement();
-    if (this.#datepickerFrom || this.#datepickerTo) {
-      this.#datepickerFrom.destroy();
-      this.#datepickerTo.destroy();
-      this.#datepickerFrom = null;
-      this.#datepickerTo = null;
-    }
-  };
-
   #dateFromChangeHandler = ([userDate]) => {
     this.updateElement({
       dateFrom: userDate
@@ -322,31 +311,6 @@ export default class TripPointEditView extends AbstractStatefulView {
     });
   };
 
-  #setDatepickerFrom = () => {
-    this.#datepickerFrom = flatpickr(
-      this.element.querySelector('#event-start-time-1'),
-      {
-        enableTime: true,
-        dateFormat: 'd/m/y H:i',
-        default: this._state.dateFrom,
-        onChange: this.#dateFromChangeHandler
-      }
-    );
-  };
-
-  #setDatepickerTo = () => {
-    this.#datepickerTo = flatpickr(
-      this.element.querySelector('#event-end-time-1'),
-      {
-        enableTime: true,
-        dateFormat: 'd/m/y H:i',
-        default: this._state.dateTo,
-        minDate: this._state.dateFrom,
-        onChange: this.#dateToChangeHandler
-      }
-    );
-  };
-
   #deletePointHandler = () => {
     if (this.#mode === Mode.EDITTING) {
       this._callback.deleteClick(TripPointEditView.parseStateToPoint(this._state));
@@ -355,7 +319,44 @@ export default class TripPointEditView extends AbstractStatefulView {
     this._callback.deleteClick();
   };
 
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
+  static parsePointToState = (offers, destinations, point) => {
+    if (point) {
+      const offersByType = getOffersByType(offers, point.type);
+
+      return {
+        ...point,
+        offers: getOffersPointSelected(offersByType, point.offers),
+        offersByType: offersByType,
+        destination: getDestination(destinations, point.destination),
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      };
+    }
+    const date = Date.now();
+
+    return {
+      offers: [],
+      type: offers[0].type,
+      offersByType: offers[0].offers,
+      basePrice: 0,
+      dateFrom: date,
+      dateTo: date
+    };
+  };
+
+  static parseStateToPoint = (state) => {
+    const data = {
+      ...state,
+      offers: state.offers.map((offer) => offer?.id),
+      destination: state.destination?.id
+    };
+
+    delete data.offersByType;
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+
+    return data;
   };
 }

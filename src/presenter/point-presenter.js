@@ -73,6 +73,17 @@ export default class PointPresenter {
     this.#tripEditComponent.shake(resetFormState);
   };
 
+  resetView = () => {
+    if (this.#mode === Mode.EDITTING) {
+      this.#replaceFormToCard();
+    }
+  };
+
+  destroy = () => {
+    remove(this.#tripPointComponent);
+    remove(this.#tripEditComponent);
+  };
+
   #replaceCardToForm = () => {
     this.#changeMode();
     this.#mode = Mode.EDITTING;
@@ -85,24 +96,16 @@ export default class PointPresenter {
     remove(this.#tripEditComponent);
   };
 
-  #onEscKeyDown = (event) => {
-    if (event.key === 'Escape' || event.key === 'esc') {
-      event.preventDefault();
-      this.#replaceFormToCard();
-      document.removeEventListener('keydown', this.#onEscKeyDown);
-    }
-  };
-
-  #handleEditClick = () => {
-    this.#replaceFormToCard();
-    document.removeEventListener('keydown', this.#onEscKeyDown);
-  };
-
   #addTripEditView = () => {
     this.#tripEditComponent = new TripPointEditView(this.#offers, this.#destinations, this.#point);
     this.#tripEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#tripEditComponent.setEditClickHandler(this.#handleEditClick);
     this.#tripEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
+  };
+
+  #handleEditClick = () => {
+    this.#replaceFormToCard();
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   #handleDeleteClick = (point) => {
@@ -130,14 +133,11 @@ export default class PointPresenter {
     );
   };
 
-  resetView = () => {
-    if (this.#mode === Mode.EDITTING) {
+  #onEscKeyDown = (event) => {
+    if (event.key === 'Escape' || event.key === 'esc') {
+      event.preventDefault();
       this.#replaceFormToCard();
+      document.removeEventListener('keydown', this.#onEscKeyDown);
     }
-  };
-
-  destroy = () => {
-    remove(this.#tripPointComponent);
-    remove(this.#tripEditComponent);
   };
 }
